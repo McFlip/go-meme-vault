@@ -20,5 +20,10 @@ func main() {
 		tmpl.Execute(w, nil)
 	})
 
+	r.Get("/memes", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("templates/memes.html"))
+		tmpl.Execute(w, nil)
+	})
+
 	http.ListenAndServe(":8080", r)
 }

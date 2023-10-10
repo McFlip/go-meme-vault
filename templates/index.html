@@ -10,9 +10,15 @@
   <title>Go Meme Vault</title>
 </head>
 <body>
-  <main class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-600 to-red-900">
+  <menu>
+    <p>Menu goes here</p>
+  </menu>
+  <main id="main" hx-boost="true" class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-600 to-red-900">
     <h1 class="text-3xl">Select an available tag to begin</h1>
     <p>Use the searchbar to search for available tags</p>
+    <ul>
+      <li><a hx-target="main" href="/memes">test tag</a></li>
+    </ul>
   </main>
 </body>
 </html>
