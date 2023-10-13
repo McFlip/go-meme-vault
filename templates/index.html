@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +10,29 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <title>Go Meme Vault</title>
 </head>
+
 <body>
   <menu>
     <p>Menu goes here</p>
   </menu>
-  <main id="main" hx-boost="true" class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-600 to-red-900">
+  <main id="main" hx-boost="true"
+    class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-600 to-red-900">
     <h1 class="text-3xl">Select an available tag to begin</h1>
     <p>Use the searchbar to search for available tags</p>
     <div id="tag-list">
       <ul>
-        <li><a hx-target="main" href="/memes">test tag</a></li>
+        <li>
+          <a hx-target="main" href="/memes">first tag</a>
+        </li>
+        <li>
+          <a hx-target="main" href="/memes">second tag</a>
+        </li>
+        <li>
+          <a hx-target="main" href="/memes">third tag</a>
+        </li>
       </ul>
     </div>
   </main>
 </body>
+
 </html>
