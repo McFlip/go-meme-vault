@@ -1,0 +1,22 @@
+{
+  "name": "bdd_tests",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "McFlip",
+  "license": "LGPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^20.8.5",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^18.0.6",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
+    "cypress": "^13.3.1",
+    "esbuild": "0.19.4"
+  }
+}
