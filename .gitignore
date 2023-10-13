@@ -24,3 +24,6 @@ go.work
 # BDD tests
 node_modules/
 screenshots/
+
+# Test DB
+*.db

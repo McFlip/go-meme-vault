@@ -21,15 +21,11 @@
     <p>Use the searchbar to search for available tags</p>
     <div id="tag-list">
       <ul>
+        {{ range . }}
         <li>
-          <a hx-target="main" href="/memes">first tag</a>
+          <a hx-target="main" href="/memes">{{ . }}</a>
         </li>
-        <li>
-          <a hx-target="main" href="/memes">second tag</a>
-        </li>
-        <li>
-          <a hx-target="main" href="/memes">third tag</a>
-        </li>
+        {{ end }}
       </ul>
     </div>
   </main>
