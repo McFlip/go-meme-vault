@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Test_GetAll(t *testing.T) {
+func connectDB() *gorm.DB {
 	const path = ":memory:"
 
 	database, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
@@ -15,6 +15,12 @@ func Test_GetAll(t *testing.T) {
 		panic("failed to connect database")
 	}
 	database.AutoMigrate(&Tag{})
+
+	return database
+}
+
+func Test_GetAll(t *testing.T) {
+	database := connectDB()
 	expected := []Tag{
 		{
 			Name: "first tag",
@@ -41,5 +47,27 @@ func Test_GetAll(t *testing.T) {
 				t.Errorf("Expected %v but got %v", expected[i].Name, actual[i].Name)
 			}
 		}
+	}
+}
+
+func Test_Create(t *testing.T) {
+	database := connectDB()
+	expected := Tag{
+		Name: "new hotness",
+	}
+	tagsmodel := TagsModel{
+		DB: database,
+	}
+
+	res := tagsmodel.Create(&expected)
+	if res.Error != nil {
+		t.Errorf("ERROR in creating tag: %s", res.Error)
+	}
+
+	// TODO: use GetByID instead of GetAll
+	actual := tagsmodel.GetAll()[expected.ID-1]
+
+	if actual.Name != expected.Name {
+		t.Errorf("Expected Tag Name to be %s, but got %s", expected.Name, actual.Name)
 	}
 }

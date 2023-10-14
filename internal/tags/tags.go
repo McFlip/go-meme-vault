@@ -18,3 +18,8 @@ func (tagsModel *TagsModel) GetAll() []Tag {
 	tagsModel.DB.Find(&tags)
 	return tags
 }
+
+func (tagsModel *TagsModel) Create(tag *Tag) *gorm.DB {
+	newTag := tagsModel.DB.Create(tag)
+	return newTag
+}
