@@ -1,4 +1,4 @@
-package tags
+package models
 
 import (
 	"gorm.io/gorm"
@@ -10,7 +10,8 @@ type TagsModel struct {
 
 type Tag struct {
 	gorm.Model
-	Name string
+	Name  string
+	Memes []*Meme `gorm:"many2many:meme_tags;"`
 }
 
 func (tagsModel *TagsModel) GetAll() ([]Tag, error) {

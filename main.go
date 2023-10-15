@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/McFlip/go-meme-vault/internal/tags"
+	tags "github.com/McFlip/go-meme-vault/internal/models"
 
 	"github.com/glebarez/sqlite"
 	"github.com/go-chi/chi/v5"

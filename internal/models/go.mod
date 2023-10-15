@@ -1,4 +1,4 @@
-module github.com/McFlip/go-meme-vault/tags
+module github.com/McFlip/go-meme-vault/models
 
 go 1.21.2
 

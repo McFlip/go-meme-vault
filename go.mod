@@ -21,10 +21,10 @@ require (
 )
 
 require (
-	github.com/McFlip/go-meme-vault/internal/tags v0.0.0-00010101000000-000000000000
+	github.com/McFlip/go-meme-vault/internal/models v0.0.0-00010101000000-000000000000
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	gorm.io/gorm v1.25.5
 )
 
-replace github.com/McFlip/go-meme-vault/internal/tags => ./internal/tags
+replace github.com/McFlip/go-meme-vault/internal/models => ./internal/models
