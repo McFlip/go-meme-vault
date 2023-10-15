@@ -37,7 +37,10 @@ func Test_GetAll(t *testing.T) {
 	}
 
 	tagsModel := TagsModel{DB: database}
-	actual := tagsModel.GetAll()
+	actual, err := tagsModel.GetAll()
+	if err != nil {
+		t.Errorf("ERROR getting all tags: %s", err)
+	}
 
 	if len(actual) != len(expected) {
 		t.Errorf("Expected %v but got %v", expected, actual)
@@ -64,8 +67,10 @@ func Test_Create(t *testing.T) {
 		t.Errorf("ERROR in creating tag: %s", res.Error)
 	}
 
-	// TODO: use GetByID instead of GetAll
-	actual := tagsmodel.GetAll()[expected.ID-1]
+	actual, err := tagsmodel.GetByID(expected.ID)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if actual.Name != expected.Name {
 		t.Errorf("Expected Tag Name to be %s, but got %s", expected.Name, actual.Name)

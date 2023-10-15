@@ -13,10 +13,16 @@ type Tag struct {
 	Name string
 }
 
-func (tagsModel *TagsModel) GetAll() []Tag {
+func (tagsModel *TagsModel) GetAll() ([]Tag, error) {
 	var tags []Tag
-	tagsModel.DB.Find(&tags)
-	return tags
+	res := tagsModel.DB.Find(&tags)
+	return tags, res.Error
+}
+
+func (tagsModel *TagsModel) GetByID(id uint) (Tag, error) {
+	var tag Tag
+	res := tagsModel.DB.First(&tag, id)
+	return tag, res.Error
 }
 
 func (tagsModel *TagsModel) Create(tag *Tag) *gorm.DB {

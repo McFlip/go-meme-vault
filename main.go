@@ -48,7 +48,10 @@ func main() {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("templates/index.html"))
-		allTags := tagsModel.GetAll()
+		allTags, err := tagsModel.GetAll()
+		if err != nil {
+			respondWithErr(w, 500, "Error getting all tags")
+		}
 		var tagNames []string
 		for _, t := range allTags {
 			tagNames = append(tagNames, t.Name)
