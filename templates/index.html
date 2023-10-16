@@ -23,7 +23,7 @@
       <ul>
         {{ range . }}
         <li>
-          <a hx-target="main" href="/memes">{{ . }}</a>
+          <a hx-target="main" href="/memes?tag={{- .ID -}}">{{ .Name }}</a>
         </li>
         {{ end }}
       </ul>

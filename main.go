@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 
 	tags "github.com/McFlip/go-meme-vault/internal/models"
 
@@ -52,16 +53,31 @@ func main() {
 		if err != nil {
 			respondWithErr(w, 500, "Error getting all tags")
 		}
-		var tagNames []string
-		for _, t := range allTags {
-			tagNames = append(tagNames, t.Name)
-		}
-		tmpl.Execute(w, tagNames)
+		tmpl.Execute(w, allTags)
 	})
 
 	r.Get("/memes", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/memes.html"))
-		tmpl.Execute(w, nil)
+		qStr := r.URL.Query()
+		tagIds := qStr["tag"]
+		// log.Println(tagIds)
+		tagSlice := make([]tags.Tag, 0, len(tagIds))
+		for _, id := range tagIds {
+			id, err := strconv.Atoi(id)
+			if err != nil {
+				respondWithErr(w, 400, "tag query param must be int")
+				return
+			}
+			t, err := tagsModel.GetByID(uint(id))
+			if err != nil {
+				respondWithErr(w, 500, "error getting tag by id")
+				return
+			}
+			tagSlice = append(tagSlice, t)
+		}
+
+		tmplFiles := []string{"templates/memes.html", "templates/partials/selected_tags.html"}
+		tmpl := template.Must(template.ParseFiles(tmplFiles...))
+		tmpl.Execute(w, tagSlice)
 	})
 
 	log.Printf("🚀 Server launched on localhost%s", port)
