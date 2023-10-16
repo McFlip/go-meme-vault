@@ -86,8 +86,21 @@ func main() {
 }
 
 func (hooks *TestHooks) HandleNuke(w http.ResponseWriter, r *http.Request) {
-	// TODO: Do a get all then for ea. Id delete
-	hooks.DB.Raw("DELETE FROM tags")
+	// GORM safeguards against unconditional deletes
+	// Do a get all then for ea. Id delete
+	// This is a 'soft' delete
+	tm := tags.TagsModel{DB: hooks.DB}
+	allTags, err := tm.GetAll()
+	if err != nil {
+		log.Println(err)
+		respondWithErr(w, 500, "error getting all tags")
+		return
+	}
+
+	for _, t := range allTags {
+		tm.DB.Delete(&t)
+	}
+
 	w.WriteHeader(200)
 }
 

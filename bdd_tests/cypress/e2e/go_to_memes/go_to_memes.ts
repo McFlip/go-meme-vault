@@ -1,5 +1,9 @@
-import { When, Then, Given } from "@badeball/cypress-cucumber-preprocessor"
+import { When, Then, Given, Before } from "@badeball/cypress-cucumber-preprocessor"
 import '@testing-library/cypress/add-commands'
+
+Before(() => {
+  cy.request('DELETE', 'http://localhost:8080/api/testhooks/nuke')
+})
 
 Given("I am on the home page", () => {
   var tag = {name: "Doom"}

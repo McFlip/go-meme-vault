@@ -1,10 +1,9 @@
-import { When, Then, Given } from "@badeball/cypress-cucumber-preprocessor"
+import { When, Then, Given, Before } from "@badeball/cypress-cucumber-preprocessor"
 import '@testing-library/cypress/add-commands'
-// const sqlite3 = require('sqlite3').verbose()
 
-// Before(() => {
-//   cy.request('DELETE', 'http://localhost:8080/api/testhooks/nuke')
-// })
+Before(() => {
+  cy.request('DELETE', 'http://localhost:8080/api/testhooks/nuke')
+})
 
 Given("Tags exist in the database", () => {
   cy.fixture('tags.json').then((tags) => {
