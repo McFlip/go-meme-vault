@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
-	tags "github.com/McFlip/go-meme-vault/internal/models"
+	"github.com/McFlip/go-meme-vault/internal/models"
 
 	"github.com/glebarez/sqlite"
 	"github.com/go-chi/chi/v5"
@@ -34,8 +34,8 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	database.AutoMigrate(&tags.Tag{})
-	tagsModel := tags.TagsModel{DB: database}
+	database.AutoMigrate(&models.Tag{})
+	tagsModel := models.TagsModel{DB: database}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -48,7 +48,8 @@ func main() {
 	r.Mount("/api/testhooks", testHooksRtr)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/index.html"))
+		tmplFiles := []string{"templates/index.html", "templates/partials/menu.html"}
+		tmpl := template.Must(template.ParseFiles(tmplFiles...))
 		allTags, err := tagsModel.GetAll()
 		if err != nil {
 			respondWithErr(w, 500, "Error getting all tags")
@@ -60,7 +61,7 @@ func main() {
 		qStr := r.URL.Query()
 		tagIds := qStr["tag"]
 		// log.Println(tagIds)
-		tagSlice := make([]tags.Tag, 0, len(tagIds))
+		tagSlice := make([]models.Tag, 0, len(tagIds))
 		for _, id := range tagIds {
 			id, err := strconv.Atoi(id)
 			if err != nil {
@@ -80,6 +81,24 @@ func main() {
 		tmpl.Execute(w, tagSlice)
 	})
 
+	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("templates/new_memes.html"))
+		tmpl.Execute(w, nil)
+	})
+
+	r.Post("/memes/scan", func(w http.ResponseWriter, r *http.Request) {
+		// TODO: memes.Scan
+		mockMemes := []models.Meme{{Name: "first meme", Path: "/public/img/full/doom_eternal.jpg"}, {Name: "second meme", Path: "/public/img/full/doom_meow.jpg"}}
+
+		tmplFiles := []string{"templates/memes_list.html", "templates/partials/meme_tn.html"}
+		tmpl := template.Must(template.ParseFiles(tmplFiles...))
+		tmpl.Execute(w, mockMemes)
+	})
+
+	staticHandler := http.StripPrefix("/public", http.FileServer(http.Dir("./public/")))
+	r.Handle("/public", staticHandler)
+	r.Handle("/public/*", staticHandler)
+
 	log.Printf("🚀 Server launched on localhost%s", port)
 	log.Printf("💾 Sqlite database saved at: %s", *dbPath)
 	log.Fatal(http.ListenAndServe(port, r))
@@ -89,7 +108,7 @@ func (hooks *TestHooks) HandleNuke(w http.ResponseWriter, r *http.Request) {
 	// GORM safeguards against unconditional deletes
 	// Do a get all then for ea. Id delete
 	// This is a 'soft' delete
-	tm := tags.TagsModel{DB: hooks.DB}
+	tm := models.TagsModel{DB: hooks.DB}
 	allTags, err := tm.GetAll()
 	if err != nil {
 		log.Println(err)
@@ -105,8 +124,8 @@ func (hooks *TestHooks) HandleNuke(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hooks *TestHooks) HandleCreateTag(w http.ResponseWriter, r *http.Request) {
-	var tag tags.Tag
-	tagsModel := tags.TagsModel{DB: hooks.DB}
+	var tag models.Tag
+	tagsModel := models.TagsModel{DB: hooks.DB}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&tag)
 	if err != nil {
