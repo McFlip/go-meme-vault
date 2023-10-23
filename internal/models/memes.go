@@ -34,3 +34,9 @@ func (memesModel *MemesModel) GetByID(id uint) (Meme, error) {
 	res := memesModel.DB.First(&meme, id)
 	return meme, res.Error
 }
+
+func (memesModel *MemesModel) GetByPath(path string) (Meme, error) {
+	var meme Meme
+	res := memesModel.DB.Where(&Meme{Path: path}).First(&meme)
+	return meme, res.Error
+}
