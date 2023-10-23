@@ -1,6 +1,9 @@
 package models
 
 import (
+	"image"
+
+	"github.com/disintegration/imaging"
 	"gorm.io/gorm"
 )
 
@@ -13,4 +16,8 @@ type Meme struct {
 	Name string
 	Path string
 	Tags []*Tag `gorm:"many2many:meme_tags;"`
+}
+
+func makeThumb(src image.Image, width int) *image.NRGBA {
+	return imaging.Resize(src, width, 0, imaging.Box)
 }

@@ -15,6 +15,7 @@ func connectDB() *gorm.DB {
 		panic("failed to connect database")
 	}
 	database.AutoMigrate(&Tag{})
+	database.AutoMigrate(&Meme{})
 
 	return database
 }
