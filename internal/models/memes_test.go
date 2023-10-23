@@ -7,7 +7,7 @@ import (
 )
 
 // Image is > desired width
-func Test_Thumnail(t *testing.T) {
+func Test_Thumbnail(t *testing.T) {
 	const testImgSrcPath = "fixtures/doom_meow.jpg"
 	const expectedWidth = 200
 	src, err := imaging.Open(testImgSrcPath)
