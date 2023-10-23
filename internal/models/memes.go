@@ -18,6 +18,9 @@ type Meme struct {
 	Tags []*Tag `gorm:"many2many:meme_tags;"`
 }
 
-func makeThumb(src image.Image, width int) *image.NRGBA {
-	return imaging.Resize(src, width, 0, imaging.Box)
+func makeThumb(src image.Image, width int) image.Image {
+	if src.Bounds().Dx() > width {
+		return imaging.Resize(src, width, 0, imaging.Box)
+	}
+	return src
 }
