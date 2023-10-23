@@ -24,3 +24,13 @@ func makeThumb(src image.Image, width int) image.Image {
 	}
 	return src
 }
+
+func (memesModel *MemesModel) Create(meme *Meme) *gorm.DB {
+	return memesModel.DB.Create(meme)
+}
+
+func (memesModel *MemesModel) GetByID(id uint) (Meme, error) {
+	var meme Meme
+	res := memesModel.DB.First(&meme, id)
+	return meme, res.Error
+}

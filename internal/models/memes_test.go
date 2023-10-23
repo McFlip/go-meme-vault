@@ -38,3 +38,28 @@ func Test_ThumbnailTooSmall(t *testing.T) {
 		t.Errorf("Expected thumbnail to be %d pixels wide but got %d", expectedWidth, actualWidth)
 	}
 }
+
+func Test_CreateMeme(t *testing.T) {
+	const expectedPath = "fixtures/doom_meow.jpg"
+	testMeme := Meme{
+		Path: expectedPath,
+	}
+	database := connectDB()
+	testModel := MemesModel{
+		DB: database,
+	}
+
+	res := testModel.Create(&testMeme)
+	if res.Error != nil {
+		t.Errorf("Failed to create meme: %s", res.Error)
+	}
+
+	actual, err := testModel.GetByID(testMeme.ID)
+	if res.Error != nil {
+		t.Errorf("Failed to get meme: %s", err)
+	}
+
+	if actual.Path != expectedPath {
+		t.Errorf("Expected new meme to have path %s, but got %s", expectedPath, actual.Path)
+	}
+}
