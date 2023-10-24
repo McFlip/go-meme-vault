@@ -29,13 +29,16 @@ func main() {
 	var p = flag.Int("p", 8080, "port to listen on")
 	flag.Parse()
 	port := fmt.Sprintf(":%d", *p)
+	const memePath = "public/img"
 
 	database, err := gorm.Open(sqlite.Open(*dbPath), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 	database.AutoMigrate(&models.Tag{})
+	database.AutoMigrate(&models.Meme{})
 	tagsModel := models.TagsModel{DB: database}
+	memesModel := models.MemesModel{DB: database}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -87,12 +90,16 @@ func main() {
 	})
 
 	r.Post("/memes/scan", func(w http.ResponseWriter, r *http.Request) {
-		// TODO: memes.Scan
-		mockMemes := []models.Meme{{Name: "first meme", Path: "/public/img/full/doom_eternal.jpg"}, {Name: "second meme", Path: "/public/img/full/doom_meow.jpg"}}
+		memeFullPath := fmt.Sprintf("%s/full", memePath)
+		freshMemes, err := memesModel.Scan(memeFullPath)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+			return
+		}
 
 		tmplFiles := []string{"templates/memes_list.html", "templates/partials/meme_tn.html"}
 		tmpl := template.Must(template.ParseFiles(tmplFiles...))
-		tmpl.Execute(w, mockMemes)
+		tmpl.Execute(w, freshMemes)
 	})
 
 	staticHandler := http.StripPrefix("/public", http.FileServer(http.Dir("./public/")))
