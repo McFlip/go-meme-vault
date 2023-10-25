@@ -61,7 +61,7 @@ func (memesModel *MemesModel) Scan(path string) ([]Meme, error) {
 		}
 		// check if img already exists as meme
 		if !d.IsDir() {
-			_, err := memesModel.GetByPath(d.Name())
+			_, err := memesModel.GetByPath(fmt.Sprintf("/%s", path))
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				// create the meme and thumb
 				newMeme := Meme{

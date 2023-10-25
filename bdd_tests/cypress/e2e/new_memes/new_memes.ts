@@ -25,3 +25,13 @@ Then("I should see a list of thumbnails for the new memes", () => {
     expect($list).to.have.length(4)
   })
 })
+
+Given("All memes in the full image path are already in the DB", () => {
+  cy.visit("http://localhost:8080/")
+  cy.get('menu').findByRole('link', {name: 'New Memes'}).click()
+  cy.findByRole('button', {name: 'Scan'}).click()
+})
+
+Then("I should not see any memes listed", () => {
+  cy.get('#memes').findAllByRole('img').should('not.exist')
+})
