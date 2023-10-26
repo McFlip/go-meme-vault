@@ -91,3 +91,9 @@ func (memesModel *MemesModel) Scan(path string) ([]Meme, error) {
 	}
 	return memes, nil
 }
+
+func (memesModel *MemesModel) GetAll() ([]Meme, error) {
+	var memes []Meme
+	res := memesModel.DB.Find(&memes)
+	return memes, res.Error
+}

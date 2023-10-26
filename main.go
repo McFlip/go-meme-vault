@@ -116,6 +116,7 @@ func (hooks *TestHooks) HandleNuke(w http.ResponseWriter, r *http.Request) {
 	// Do a get all then for ea. Id delete
 	// This is a 'soft' delete
 	tm := models.TagsModel{DB: hooks.DB}
+	mm := models.MemesModel{DB: hooks.DB}
 	allTags, err := tm.GetAll()
 	if err != nil {
 		log.Println(err)
@@ -125,6 +126,17 @@ func (hooks *TestHooks) HandleNuke(w http.ResponseWriter, r *http.Request) {
 
 	for _, t := range allTags {
 		tm.DB.Delete(&t)
+	}
+
+	allMemes, err := mm.GetAll()
+	if err != nil {
+		log.Println(err)
+		respondWithErr(w, 500, "error getting all memes")
+		return
+	}
+
+	for _, m := range allMemes {
+		tm.DB.Delete(&m)
 	}
 
 	w.WriteHeader(200)

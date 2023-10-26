@@ -88,3 +88,30 @@ func Test_GetByPath(t *testing.T) {
 		t.Errorf("Expected new meme to have path %s, but got %s", expectedPath, actual.Path)
 	}
 }
+
+func Test_GetAllMemes(t *testing.T) {
+	const expectedPath = "fixtures/doom_meow.jpg"
+	testMeme := Meme{
+		Path: expectedPath,
+	}
+	database := connectDB()
+	testModel := MemesModel{
+		DB: database,
+	}
+
+	res := testModel.Create(&testMeme)
+	if res.Error != nil {
+		t.Errorf("Failed to create meme: %s", res.Error)
+	}
+
+	actual, err := testModel.GetAll()
+	if res.Error != nil {
+		t.Errorf("Failed to get meme: %s", err)
+	}
+
+	if len(actual) != 1 {
+		t.Errorf("Expected memes count to be 1, but got %d", len(actual))
+	} else if actual[0].Path != expectedPath {
+		t.Errorf("Expected new meme to have path %s, but got %s", expectedPath, actual[0].Path)
+	}
+}
