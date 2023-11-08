@@ -13,3 +13,11 @@ Feature: Scan for new memes
     Given All memes in the full image path are already in the DB
     When I click the Scan button
     Then I should not see any memes listed
+
+  Scenario: Meme Lord wants to see a large version of one of the fresh memes
+    Given There are new images in the full image path
+    And The new memes have not been loaded in the DB yet
+    And I am on the new memes page
+    When I click the Scan button
+    And I select the first thumbnail
+    Then I should see a modal with the full image

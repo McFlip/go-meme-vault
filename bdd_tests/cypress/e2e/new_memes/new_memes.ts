@@ -35,3 +35,15 @@ Given("All memes in the full image path are already in the DB", () => {
 Then("I should not see any memes listed", () => {
   cy.get('#memes').findAllByRole('img').should('not.exist')
 })
+
+Given("The new memes have not been loaded in the DB yet", () => {
+  cy.request('DELETE', 'http://localhost:8080/api/testhooks/nuke')
+})
+
+When("I select the first thumbnail", () => {
+  cy.get('#memes').findAllByRole('img').first().click()
+})
+
+Then("I should see a modal with the full image", () => {
+  cy.get('#modal').findByRole('img').should('exist')
+})

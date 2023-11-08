@@ -112,32 +112,9 @@ func main() {
 }
 
 func (hooks *TestHooks) HandleNuke(w http.ResponseWriter, r *http.Request) {
-	// GORM safeguards against unconditional deletes
-	// Do a get all then for ea. Id delete
-	// This is a 'soft' delete
-	tm := models.TagsModel{DB: hooks.DB}
-	mm := models.MemesModel{DB: hooks.DB}
-	allTags, err := tm.GetAll()
-	if err != nil {
-		log.Println(err)
-		respondWithErr(w, 500, "error getting all tags")
-		return
-	}
-
-	for _, t := range allTags {
-		tm.DB.Delete(&t)
-	}
-
-	allMemes, err := mm.GetAll()
-	if err != nil {
-		log.Println(err)
-		respondWithErr(w, 500, "error getting all memes")
-		return
-	}
-
-	for _, m := range allMemes {
-		tm.DB.Delete(&m)
-	}
+	hooks.DB.Unscoped().Exec("DELETE FROM tags")
+	hooks.DB.Unscoped().Exec("DELETE FROM memes")
+	hooks.DB.Unscoped().Exec("DELETE FROM meme_tags")
 
 	w.WriteHeader(200)
 }
