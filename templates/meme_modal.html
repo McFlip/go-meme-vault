@@ -1,0 +1,10 @@
+<div x-data="{'showModal': true}">
+  <div x-show="showModal">
+    <div>
+      <button @click="showModal = false">close</button>
+    </div>
+    <div>
+      <img src="{{.Path}}" alt="{{.Name}}">
+    </div>
+  </div>
+</div>

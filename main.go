@@ -84,6 +84,22 @@ func main() {
 		tmpl.Execute(w, tagSlice)
 	})
 
+	r.Get("/memes/{memeId}", func(w http.ResponseWriter, r *http.Request) {
+		memeId := chi.URLParam(r, "memeId")
+		id, err := strconv.Atoi(memeId)
+		if err != nil {
+			respondWithErr(w, 400, "memeId must be an int")
+			return
+		}
+		meme, err := memesModel.GetByID(uint(id))
+		if err != nil {
+			respondWithErr(w, 500, "error getting meme by id")
+			return
+		}
+		tmpl := template.Must(template.ParseFiles("templates/meme_modal.html"))
+		tmpl.Execute(w, meme)
+	})
+
 	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("templates/new_memes.html"))
 		tmpl.Execute(w, nil)
