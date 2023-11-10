@@ -1,0 +1,6 @@
+<form hx-delete="/memes/{{.MemeId}}/tags/{{.TagId}}">
+  <input name="meme_id" hidden readonly value="{{.MemeId}}" />
+  <input name="tag_id" hidden readonly value="{{.TagId}}" />
+  <span>{{.Name}}</span>
+  <input type="submit" value="X" />
+</form>

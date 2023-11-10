@@ -47,3 +47,12 @@ When("I select the first thumbnail", () => {
 Then("I should see a modal with the full image", () => {
   cy.get('#modal').findByRole('img').should('exist')
 })
+
+When("I submit a new tag", () => {
+  cy.get("#modal").findByRole('searchbox').type('Test Tag')
+  cy.get("#modal").findByRole('button', {name: 'Create'}).click()
+})
+
+Then("I should see the new tag in the list of tags for this meme", () => {
+  cy.get("#tags").findByText('Test Tag').should('exist')
+})

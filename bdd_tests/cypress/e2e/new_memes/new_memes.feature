@@ -21,3 +21,12 @@ Feature: Scan for new memes
     When I click the Scan button
     And I select the first thumbnail
     Then I should see a modal with the full image
+
+  Scenario: Meme Lord wants to create a new tag for a new meme
+    Given There are new images in the full image path
+    And The new memes have not been loaded in the DB yet
+    And I am on the new memes page
+    When I click the Scan button
+    And I select the first thumbnail
+    And I submit a new tag
+    Then I should see the new tag in the list of tags for this meme

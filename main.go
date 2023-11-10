@@ -24,6 +24,12 @@ type errRes struct {
 	Err string `json:"error"`
 }
 
+type tagParams struct {
+	MemeId int
+	TagId  int
+	Name   string
+}
+
 func main() {
 	var dbPath = flag.String("db-path", ":memory:", "path to sqlite file")
 	var p = flag.Int("p", 8080, "port to listen on")
@@ -96,7 +102,8 @@ func main() {
 			respondWithErr(w, 500, "error getting meme by id")
 			return
 		}
-		tmpl := template.Must(template.ParseFiles("templates/meme_modal.html"))
+		tmplFiles := []string{"templates/meme_modal.html", "templates/partials/create_tag.html"}
+		tmpl := template.Must(template.ParseFiles(tmplFiles...))
 		tmpl.Execute(w, meme)
 	})
 
@@ -117,6 +124,39 @@ func main() {
 		tmpl := template.Must(template.ParseFiles(tmplFiles...))
 		tmpl.Execute(w, freshMemes)
 	})
+
+	r.Post("/tags", func(w http.ResponseWriter, r *http.Request) {
+		memeId, err := strconv.Atoi(r.PostFormValue("memeId"))
+		if err != nil {
+			respondWithErr(w, 400, "bad form data")
+			return
+		}
+		meme, err := memesModel.GetByID(uint(memeId))
+		if err != nil {
+			respondWithErr(w, 404, "missing meme ref")
+			return
+		}
+
+		tag := models.Tag{
+			Name:  r.PostFormValue("search_str"),
+			Memes: []*models.Meme{&meme},
+		}
+		res := tagsModel.Create(&tag)
+		if res.Error != nil {
+			respondWithErr(w, 500, res.Error.Error())
+			return
+		}
+		newTag := tagParams{
+			MemeId: int(meme.ID),
+			TagId:  int(tag.ID),
+			Name:   tag.Name,
+		}
+		tmpl := template.Must(template.ParseFiles("templates/tag.html"))
+		tmpl.Execute(w, newTag)
+	})
+
+	// TODO: remove a tag from a meme
+	r.Delete("/memes/{memeId}/tags/{tagId}", func(w http.ResponseWriter, r *http.Request) {})
 
 	staticHandler := http.StripPrefix("/public", http.FileServer(http.Dir("./public/")))
 	r.Handle("/public", staticHandler)
