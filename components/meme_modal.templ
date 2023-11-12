@@ -1,0 +1,21 @@
+package components
+
+import "github.com/McFlip/go-meme-vault/internal/models"
+
+templ MemeModal(meme models.Meme) {
+  <div x-data="{'showModal': true}">
+    <div x-show="showModal">
+      <div>
+        <button @click="showModal = false">close</button>
+      </div>
+      <div>
+        @CreateTag(meme)
+      </div>
+      <div>
+        <img src={meme.Path} alt={meme.Name} />
+      </div>
+      <h3>Tags:</h3>
+      <div id="tags"></div>
+    </div>
+  </div>
+}

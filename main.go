@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/McFlip/go-meme-vault/components"
 	"github.com/McFlip/go-meme-vault/internal/models"
 
 	"github.com/glebarez/sqlite"
@@ -102,9 +103,10 @@ func main() {
 			respondWithErr(w, 500, "error getting meme by id")
 			return
 		}
-		tmplFiles := []string{"templates/meme_modal.html", "templates/partials/create_tag.html"}
-		tmpl := template.Must(template.ParseFiles(tmplFiles...))
-		tmpl.Execute(w, meme)
+		err = components.MemeModal(meme).Render(r.Context(), w)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
 	})
 
 	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
