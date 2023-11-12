@@ -1,0 +1,10 @@
+package components
+
+import "github.com/McFlip/go-meme-vault/internal/models"
+import "fmt"
+
+templ MemeTn(meme models.Meme) {
+  <p>
+    <img src={meme.GetThumbnail()} alt={meme.Name} hx-get={fmt.Sprintf("/memes/%v", meme.ID)} hx-target="#modal" />
+  </p>
+}

@@ -1,0 +1,27 @@
+package components
+
+import "github.com/McFlip/go-meme-vault/internal/models"
+
+templ Memes(tags []models.Tag, memes []models.Meme) {
+  <div>
+    <h1>MEMES</h1>
+    <div>
+      <h2>Selected Tags</h2>
+      <ul>
+        for _, tag := range tags {
+          <li>{tag.Name}</li>
+        }
+      </ul>
+    </div>
+    <div>
+      @MemesList(memes)
+    </div>
+  </div>
+}
+      // <ul>
+        // for _, meme := range memes {
+        //   <li>
+        //     <img src={meme.Path} alt={meme.Name} />
+        //   </li>
+        // }
+      // </ul>

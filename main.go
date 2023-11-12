@@ -72,6 +72,8 @@ func main() {
 		tagIds := qStr["tag"]
 		// log.Println(tagIds)
 		tagSlice := make([]models.Tag, 0, len(tagIds))
+		var memesSlice []models.Meme
+		memesMap := make(map[uint]models.Meme)
 		for _, id := range tagIds {
 			id, err := strconv.Atoi(id)
 			if err != nil {
@@ -84,11 +86,19 @@ func main() {
 				return
 			}
 			tagSlice = append(tagSlice, t)
+			for _, m := range t.Memes {
+				log.Println(m)
+				memesMap[m.ID] = *m
+			}
+		}
+		for _, m := range memesMap {
+			memesSlice = append(memesSlice, m)
 		}
 
-		tmplFiles := []string{"templates/memes.html", "templates/partials/selected_tags.html"}
-		tmpl := template.Must(template.ParseFiles(tmplFiles...))
-		tmpl.Execute(w, tagSlice)
+		err = components.Memes(tagSlice, memesSlice).Render(r.Context(), w)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
 	})
 
 	r.Get("/memes/{memeId}", func(w http.ResponseWriter, r *http.Request) {

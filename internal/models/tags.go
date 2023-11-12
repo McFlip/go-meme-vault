@@ -22,7 +22,7 @@ func (tagsModel *TagsModel) GetAll() ([]Tag, error) {
 
 func (tagsModel *TagsModel) GetByID(id uint) (Tag, error) {
 	var tag Tag
-	res := tagsModel.DB.First(&tag, id)
+	res := tagsModel.DB.Preload("Memes").First(&tag, id)
 	return tag, res.Error
 }
 
