@@ -42,7 +42,7 @@ func (memesModel *MemesModel) Create(meme *Meme) *gorm.DB {
 
 func (memesModel *MemesModel) GetByID(id uint) (Meme, error) {
 	var meme Meme
-	res := memesModel.DB.First(&meme, id)
+	res := memesModel.DB.Preload("Tags").First(&meme, id)
 	return meme, res.Error
 }
 

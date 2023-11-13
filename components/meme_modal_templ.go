@@ -11,6 +11,7 @@ import "io"
 import "bytes"
 
 import "github.com/McFlip/go-meme-vault/internal/models"
+import "strconv"
 
 func MemeModal(meme models.Meme) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
@@ -67,7 +68,17 @@ func MemeModal(meme models.Meme) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h3><div id=\"tags\"></div></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h3><div><ul id=\"tags\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, tag := range meme.Tags {
+			templ_7745c5c3_Err = Tag(TagParams{MemeId: strconv.Itoa(int(meme.ID)), TagId: strconv.Itoa(int(tag.ID)), Name: tag.Name}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</ul></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -25,12 +25,6 @@ type errRes struct {
 	Err string `json:"error"`
 }
 
-type tagParams struct {
-	MemeId int
-	TagId  int
-	Name   string
-}
-
 func main() {
 	var dbPath = flag.String("db-path", ":memory:", "path to sqlite file")
 	var p = flag.Int("p", 8080, "port to listen on")
@@ -158,13 +152,15 @@ func main() {
 			respondWithErr(w, 500, res.Error.Error())
 			return
 		}
-		newTag := tagParams{
-			MemeId: int(meme.ID),
-			TagId:  int(tag.ID),
+		newTag := components.TagParams{
+			MemeId: strconv.Itoa(int(meme.ID)),
+			TagId:  strconv.Itoa(int(tag.ID)),
 			Name:   tag.Name,
 		}
-		tmpl := template.Must(template.ParseFiles("templates/tag.html"))
-		tmpl.Execute(w, newTag)
+		err = components.Tag(newTag).Render(r.Context(), w)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
 	})
 
 	// TODO: remove a tag from a meme

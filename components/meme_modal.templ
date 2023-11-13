@@ -1,6 +1,7 @@
 package components
 
 import "github.com/McFlip/go-meme-vault/internal/models"
+import "strconv"
 
 templ MemeModal(meme models.Meme) {
   <div x-data="{'showModal': true}">
@@ -15,7 +16,13 @@ templ MemeModal(meme models.Meme) {
         <img src={meme.Path} alt={meme.Name} />
       </div>
       <h3>Tags:</h3>
-      <div id="tags"></div>
+      <div>
+        <ul id="tags">
+          for _, tag := range meme.Tags {
+            @Tag(TagParams{MemeId: strconv.Itoa(int(meme.ID)), TagId: strconv.Itoa(int(tag.ID)), Name: tag.Name})
+          }
+        </ul>
+      </div>
     </div>
   </div>
 }

@@ -1,0 +1,18 @@
+package components
+
+import "fmt"
+
+type TagParams struct {
+	MemeId, TagId, Name string
+}
+
+templ Tag(params TagParams) {
+  <ul>
+    <form hx-delete={fmt.Sprintf("/memes/%s/tags/%s", params.MemeId, params.TagId)}>
+      <input name="meme_id" hidden readonly value={params.MemeId} />
+      <input name="tag_id" hidden readonly value={params.TagId} />
+      <span>{params.Name}</span>
+      <input type="submit" value="X" />
+    </form>
+  </ul>
+}
