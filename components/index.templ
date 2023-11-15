@@ -1,0 +1,29 @@
+package components
+
+import "github.com/McFlip/go-meme-vault/internal/models"
+
+templ Index(tags []models.Tag) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.6"></script>
+			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+			<title>Go Meme Vault</title>
+		</head>
+		<body hx-boost="true">
+			@Menu()
+			<main
+ 				id="main"
+ 				class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-600 to-red-900"
+			>
+				<h1 class="text-3xl">Select an available tag to begin</h1>
+				<p>Use the searchbar to search for available tags</p>
+				@TagsList(tags)
+			</main>
+		</body>
+	</html>
+}

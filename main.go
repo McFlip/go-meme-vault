@@ -52,13 +52,11 @@ func main() {
 	r.Mount("/api/testhooks", testHooksRtr)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		tmplFiles := []string{"templates/index.html", "templates/partials/menu.html"}
-		tmpl := template.Must(template.ParseFiles(tmplFiles...))
 		allTags, err := tagsModel.GetAll()
 		if err != nil {
 			respondWithErr(w, 500, "Error getting all tags")
 		}
-		tmpl.Execute(w, allTags)
+		components.Index(allTags).Render(r.Context(), w)
 	})
 
 	r.Get("/memes", func(w http.ResponseWriter, r *http.Request) {
@@ -161,6 +159,19 @@ func main() {
 		if err != nil {
 			respondWithErr(w, 500, err.Error())
 		}
+	})
+
+	r.Post("/tags/search", func(w http.ResponseWriter, r *http.Request) {
+		// qStr := r.URL.Query().Get("q")
+		qStr := r.PostFormValue("search")
+
+		tags, err := tagsModel.Search(qStr)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+			return
+		}
+
+		components.TagsList(tags).Render(r.Context(), w)
 	})
 
 	// TODO: remove a tag from a meme

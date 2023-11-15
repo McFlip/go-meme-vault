@@ -1,0 +1,16 @@
+package components
+
+import "github.com/McFlip/go-meme-vault/internal/models"
+import "fmt"
+
+templ TagsList(tags []models.Tag) {
+	<div id="tag-list">
+		<ul>
+			for _,tag := range tags {
+				<li>
+					<a hx-target="main" href={ templ.SafeURL(fmt.Sprintf("/memes?tag=%v", tag.ID)) }>{ tag.Name }</a>
+				</li>
+			}
+		</ul>
+	</div>
+}

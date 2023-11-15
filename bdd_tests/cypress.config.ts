@@ -19,5 +19,9 @@ export default defineConfig({
       );
       return config;
     },
+    env: {
+      omitFiltered: true,
+      filterSpecs: true
+    },
   },
 });

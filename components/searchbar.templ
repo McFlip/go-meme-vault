@@ -1,0 +1,14 @@
+package components
+
+// import "github.com/McFlip/go-meme-vault/internal/models"
+// import "fmt"
+
+templ Searchbar() {
+	<div id="searchbar">
+		<form>
+			<label for="search">Search</label>
+			<input id="search" type="search" name="search" placeholder="search for tag" hx-trigger="input changed delay:500ms, search" hx-post="/tags/search" hx-target="#search-results"/>
+		</form>
+		<div id="search-results"></div>
+	</div>
+}

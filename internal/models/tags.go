@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -29,4 +31,10 @@ func (tagsModel *TagsModel) GetByID(id uint) (Tag, error) {
 func (tagsModel *TagsModel) Create(tag *Tag) *gorm.DB {
 	newTag := tagsModel.DB.Create(tag)
 	return newTag
+}
+
+func (tagsModel *TagsModel) Search(q string) ([]Tag, error) {
+	var tags []Tag
+	res := tagsModel.DB.Where("Name LIKE ?", fmt.Sprintf("%%%s%%", q)).First(&tags)
+	return tags, res.Error
 }
