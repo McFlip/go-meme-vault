@@ -49,10 +49,23 @@ Then("I should see a modal with the full image", () => {
 })
 
 When("I submit a new tag", () => {
-  cy.get("#modal").findByRole('searchbox').type('Test Tag')
+  cy.get("#modal").findByRole('searchbox').type('first tag')
   cy.get("#modal").findByRole('button', {name: 'Create'}).click()
 })
 
 Then("I should see the new tag in the list of tags for this meme", () => {
-  cy.get("#tags").findByText('Test Tag').should('exist')
+  cy.get("#tags").findByText('first tag').should('exist')
+})
+
+Given("A tag exists in the DB", () => {
+    cy.fixture('tags.json').then((tags) => {
+    tags.forEach(tag => {
+      cy.request('POST', 'http://localhost:8080/api/testhooks/tags', tag)
+    });
+  })
+})
+
+When("I select the existing tag", () => {
+  cy.get("#modal").findByRole('searchbox').type('first')
+  cy.get("#modal").findByRole('button', {name: 'first tag'}).click()
 })

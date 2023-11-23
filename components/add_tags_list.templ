@@ -1,0 +1,18 @@
+package components
+
+import "github.com/McFlip/go-meme-vault/internal/models"
+import "fmt"
+
+templ AddTagsList(memeId string, tags []models.Tag) {
+	<div id="tag-list">
+		<ul>
+			for _,tag := range tags {
+				<li>
+					<form hx-patch={ fmt.Sprintf("/memes/%s/tags/%v", memeId, tag.ID) } hx-target="#tags" hx-swap="beforeend" x-data="{ selected: false }">
+						<button type="submit" x-show="!selected" @click="selected = true">{ tag.Name }</button>
+					</form>
+				</li>
+			}
+		</ul>
+	</div>
+}

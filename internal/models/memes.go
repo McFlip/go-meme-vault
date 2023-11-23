@@ -6,6 +6,8 @@ import (
 	"image"
 	"io/fs"
 	"path/filepath"
+	"slices"
+	"sort"
 	"strings"
 
 	"github.com/disintegration/imaging"
@@ -96,4 +98,39 @@ func (memesModel *MemesModel) GetAll() ([]Meme, error) {
 	var memes []Meme
 	res := memesModel.DB.Find(&memes)
 	return memes, res.Error
+}
+
+func (memesModel *MemesModel) FilterTags(id uint, tags []Tag) ([]Tag, error) {
+	meme, err := memesModel.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filteredTags := make([]Tag, 0, len(tags))
+	tagIds := make(sort.IntSlice, 0, len(meme.Tags))
+	for _, t := range meme.Tags {
+		tagIds = append(tagIds, int(t.ID))
+	}
+	tagIds.Sort()
+	for _, t := range tags {
+		_, found := slices.BinarySearch(tagIds, int(t.ID))
+		if !found {
+			filteredTags = append(filteredTags, t)
+		}
+	}
+
+	return filteredTags, nil
+}
+
+func (memesModel *MemesModel) AddTag(id uint, tag Tag) (Meme, error) {
+	meme, err := memesModel.GetByID(id)
+	if err != nil {
+		return meme, err
+	}
+
+	tags := meme.Tags
+	tags = append(tags, &tag)
+	res := memesModel.DB.Model(&meme).Update("Tags", tags)
+
+	return meme, res.Error
 }

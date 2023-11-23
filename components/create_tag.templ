@@ -4,10 +4,13 @@ import "github.com/McFlip/go-meme-vault/internal/models"
 import "strconv"
 
 templ CreateTag(meme models.Meme) {
-  <form hx-post="/tags" hx-target="#tags" hx-swap="beforeend">
-    <input hidden name="memeId" readonly value={strconv.Itoa(int(meme.ID))} />
-    <label for="search_str">Search for or create tag</label>
-    <input type="search" id="search_str" name="search_str" placeholder="New Tag" />
-    <button type="submit">Create</button>
-  </form>
+	<div id="search_create">
+		<form hx-post="/tags" hx-target="#tags" hx-swap="beforeend">
+			<input hidden name="memeId" readonly value={ strconv.Itoa(int(meme.ID)) }/>
+			<label for="search">Search for or create tag</label>
+			<input type="search" id="search" name="search" placeholder="New Tag" hx-trigger="input changed delay:500ms, search" hx-post="/tags/search" hx-target="#modal-search-results" hx-swap="replace"/>
+			<button type="submit">Create</button>
+		</form>
+		<div id="modal-search-results"></div>
+	</div>
 }

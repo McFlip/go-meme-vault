@@ -30,3 +30,13 @@ Feature: Scan for new memes
     And I select the first thumbnail
     And I submit a new tag
     Then I should see the new tag in the list of tags for this meme
+
+  Scenario: Meme Lord wants to tag a new meme with an existing tag
+    Given There are new images in the full image path
+    And The new memes have not been loaded in the DB yet
+    And I am on the new memes page
+    And A tag exists in the DB
+    When I click the Scan button
+    And I select the first thumbnail
+    And I select the existing tag
+    Then I should see the new tag in the list of tags for this meme

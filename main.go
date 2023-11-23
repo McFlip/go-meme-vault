@@ -142,7 +142,7 @@ func main() {
 		}
 
 		tag := models.Tag{
-			Name:  r.PostFormValue("search_str"),
+			Name:  r.PostFormValue("search"),
 			Memes: []*models.Meme{&meme},
 		}
 		res := tagsModel.Create(&tag)
@@ -164,6 +164,15 @@ func main() {
 	r.Post("/tags/search", func(w http.ResponseWriter, r *http.Request) {
 		// qStr := r.URL.Query().Get("q")
 		qStr := r.PostFormValue("search")
+		memeIdStr := r.PostFormValue("memeId")
+		memeId := 0
+		if memeIdStr != "" {
+			memeId, err = strconv.Atoi(memeIdStr)
+			if err != nil {
+				respondWithErr(w, 400, "bad form data")
+				return
+			}
+		}
 
 		tags, err := tagsModel.Search(qStr)
 		if err != nil {
@@ -171,7 +180,51 @@ func main() {
 			return
 		}
 
-		components.TagsList(tags).Render(r.Context(), w)
+		if memeId == 0 {
+			components.TagsList(tags).Render(r.Context(), w)
+		} else {
+			// filter out tags already attached to meme
+			filteredTags, err := memesModel.FilterTags(uint(memeId), tags)
+			if err != nil {
+				respondWithErr(w, 500, err.Error())
+				return
+			}
+			// render AddTagsList
+			components.AddTagsList(memeIdStr, filteredTags).Render(r.Context(), w)
+		}
+	})
+
+	r.Patch("/memes/{memeId}/tags/{tagId}", func(w http.ResponseWriter, r *http.Request) {
+		memeIdStr := chi.URLParam(r, "memeId")
+		memeId, err := strconv.Atoi(memeIdStr)
+		if err != nil {
+			respondWithErr(w, 400, "memeId must be an int")
+			return
+		}
+		tagIdStr := chi.URLParam(r, "tagId")
+		tagId, err := strconv.Atoi(tagIdStr)
+		if err != nil {
+			respondWithErr(w, 400, "tagId must be an int")
+			return
+		}
+		tag, err := tagsModel.GetByID(uint(tagId))
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+			return
+		}
+
+		_, err = memesModel.AddTag(uint(memeId), tag)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+			return
+		}
+
+		newTag := components.TagParams{
+			MemeId: memeIdStr,
+			TagId:  tagIdStr,
+			Name:   tag.Name,
+		}
+		components.Tag(newTag).Render(r.Context(), w)
 	})
 
 	// TODO: remove a tag from a meme

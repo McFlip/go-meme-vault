@@ -115,3 +115,69 @@ func Test_GetAllMemes(t *testing.T) {
 		t.Errorf("Expected new meme to have path %s, but got %s", expectedPath, actual[0].Path)
 	}
 }
+
+func Test_FilterTags(t *testing.T) {
+	testTag1 := Tag{
+		Name: "First Tag",
+	}
+	testTag2 := Tag{
+		Name: "Second Tag",
+	}
+	testMeme := Meme{
+		Tags: []*Tag{&testTag1},
+	}
+	database := connectDB()
+	testModel := MemesModel{
+		DB: database,
+	}
+	res := testModel.Create(&testMeme)
+	if res.Error != nil {
+		t.Errorf("Failed to create test meme: %s", res.Error)
+	}
+
+	actual, err := testModel.FilterTags(testMeme.ID, []Tag{testTag1, testTag2})
+	if err != nil {
+		t.Errorf("Failed to filter tags: %s", err)
+	}
+
+	if len(actual) != 1 {
+		t.Errorf("Expected tags length of 1, but got %v", len(actual))
+	} else {
+		if actual[0].Name != testTag2.Name {
+			t.Errorf("Expected filtered tag name to be %s, but got %s", testTag2.Name, actual[0].Name)
+		}
+	}
+}
+
+func Test_AddTag(t *testing.T) {
+	testTag1 := Tag{
+		Name: "First Tag",
+	}
+	testTag2 := Tag{
+		Name: "Second Tag",
+	}
+	testMeme := Meme{
+		Tags: []*Tag{&testTag1},
+	}
+	database := connectDB()
+	testModel := MemesModel{
+		DB: database,
+	}
+	res := testModel.Create(&testMeme)
+	if res.Error != nil {
+		t.Errorf("Failed to create test meme: %s", res.Error)
+	}
+
+	actual, err := testModel.AddTag(testMeme.ID, testTag2)
+	if err != nil {
+		t.Errorf("Failed to add tag: %s", err)
+	}
+
+	if len(actual.Tags) != 2 {
+		t.Errorf("Expected tags length of 2, but got %v", len(actual.Tags))
+	} else {
+		if actual.Tags[1].Name != testTag2.Name {
+			t.Errorf("Expected 2nd tag name to be %s, but got %s", testTag2.Name, actual.Tags[1].Name)
+		}
+	}
+}
