@@ -40,3 +40,13 @@ Feature: Scan for new memes
     And I select the first thumbnail
     And I select the existing tag
     Then I should see the new tag in the list of tags for this meme
+
+  Scenario: Meme Lord changes their mind after adding a tag and removes it
+    Given There are new images in the full image path
+    And The new memes have not been loaded in the DB yet
+    And I am on the new memes page
+    When I click the Scan button
+    And I select the first thumbnail
+    And I submit a new tag
+    And I delete the tag
+    Then I should not see any tags for this meme
