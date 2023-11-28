@@ -134,3 +134,14 @@ func (memesModel *MemesModel) AddTag(id uint, tag Tag) (Meme, error) {
 
 	return meme, res.Error
 }
+
+func (memesModel *MemesModel) RemoveTag(id uint, tag Tag) (error) {
+	meme, err := memesModel.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	err = memesModel.DB.Model(&meme).Association("Tags").Delete(&tag)
+
+	return err
+}

@@ -227,8 +227,29 @@ func main() {
 		components.Tag(newTag).Render(r.Context(), w)
 	})
 
-	// TODO: remove a tag from a meme
-	r.Delete("/memes/{memeId}/tags/{tagId}", func(w http.ResponseWriter, r *http.Request) {})
+	// remove a tag from a meme
+	r.Delete("/memes/{memeId}/tags/{tagId}", func(w http.ResponseWriter, r *http.Request) {
+		memeId, err := strconv.Atoi(chi.URLParam(r, "memeId"))
+		if err != nil {
+			respondWithErr(w, 400, "memeId must be an int")
+			return
+		}
+		tagId, err := strconv.Atoi(chi.URLParam(r, "tagId"))
+		if err != nil {
+			respondWithErr(w, 400, "tagId must be an int")
+			return
+		}
+
+		tag, err := tagsModel.GetByID(uint(tagId))
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
+
+		err = memesModel.RemoveTag(uint(memeId), tag)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
+	})
 
 	staticHandler := http.StripPrefix("/public", http.FileServer(http.Dir("./public/")))
 	r.Handle("/public", staticHandler)

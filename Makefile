@@ -9,4 +9,4 @@ test.exe :
 	go build -o test.exe
 
 clean :
-	rm *.exe
+	rm *.exe dev.db
