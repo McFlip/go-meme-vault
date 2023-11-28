@@ -128,11 +128,9 @@ func (memesModel *MemesModel) AddTag(id uint, tag Tag) (Meme, error) {
 		return meme, err
 	}
 
-	tags := meme.Tags
-	tags = append(tags, &tag)
-	res := memesModel.DB.Model(&meme).Update("Tags", tags)
+	err = memesModel.DB.Model(&meme).Association("Tags").Append(&tag)
 
-	return meme, res.Error
+	return meme, err
 }
 
 func (memesModel *MemesModel) RemoveTag(id uint, tag Tag) (error) {
