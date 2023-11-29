@@ -181,3 +181,33 @@ func Test_AddTag(t *testing.T) {
 		}
 	}
 }
+
+func Test_RemoveTag(t *testing.T) {
+	testTag1 := Tag{
+		Name: "First Tag",
+	}
+	testMeme := Meme{
+		Tags: []*Tag{&testTag1},
+	}
+	database := connectDB()
+	testModel := MemesModel{
+		DB: database,
+	}
+	res := testModel.Create(&testMeme)
+	if res.Error != nil {
+		t.Errorf("Failed to create test meme: %s", res.Error)
+	}
+
+	err := testModel.RemoveTag(testMeme.ID, testTag1)
+	if err != nil {
+		t.Errorf("Failed to remove tag: %s", err)
+	}
+
+	actual, err := testModel.GetByID(testMeme.ID)
+	if err != nil {
+		t.Errorf("Failed to get test meme: %s", err)
+	}
+	if len(actual.Tags) != 0 {
+		t.Errorf("Expected tags length of 0, but got %v", len(actual.Tags))
+	}
+}
