@@ -50,3 +50,13 @@ Feature: Scan for new memes
     And I submit a new tag
     And I delete the tag
     Then I should not see any tags for this meme
+
+  Scenario: Meme Lord wants to resume tagging new memes after leaving new memes page
+    Given There are new images in the full image path
+    And The new memes have not been loaded in the DB yet
+    And I am on the new memes page
+    When I click the Scan button
+    And I select the first thumbnail
+    And I submit a new tag
+    And I navigate to the untagged memes page
+    Then I should the remaining memes that have not been tagged

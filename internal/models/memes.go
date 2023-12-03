@@ -100,6 +100,12 @@ func (memesModel *MemesModel) GetAll() ([]Meme, error) {
 	return memes, res.Error
 }
 
+func (memesModel *MemesModel) GetUntagged() ([]Meme, error) {
+	var memes []Meme
+	res := memesModel.DB.Raw("select * from memes where id not in (select distinct meme_id from meme_tags)").Scan(&memes)
+	return memes, res.Error
+}
+
 func (memesModel *MemesModel) FilterTags(id uint, tags []Tag) ([]Tag, error) {
 	meme, err := memesModel.GetByID(id)
 	if err != nil {
@@ -133,7 +139,7 @@ func (memesModel *MemesModel) AddTag(id uint, tag Tag) (Meme, error) {
 	return meme, err
 }
 
-func (memesModel *MemesModel) RemoveTag(id uint, tag Tag) (error) {
+func (memesModel *MemesModel) RemoveTag(id uint, tag Tag) error {
 	meme, err := memesModel.GetByID(id)
 	if err != nil {
 		return err

@@ -93,6 +93,18 @@ func main() {
 		}
 	})
 
+	r.Get("/memes/untagged", func(w http.ResponseWriter, r *http.Request) {
+		var tagSlice []models.Tag
+		memesSlice, err := memesModel.GetUntagged()
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
+		err = components.Memes(tagSlice, memesSlice).Render(r.Context(), w)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
+	})
+
 	r.Get("/memes/{memeId}", func(w http.ResponseWriter, r *http.Request) {
 		memeId := chi.URLParam(r, "memeId")
 		id, err := strconv.Atoi(memeId)

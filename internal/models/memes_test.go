@@ -149,6 +149,44 @@ func Test_FilterTags(t *testing.T) {
 	}
 }
 
+func Test_GetUntagged(t *testing.T) {
+	testTag := Tag{
+		Name: "Test Tag",
+	}
+	testMemeWithTag := Meme{
+		Name: "With Tag",
+		Tags: []*Tag{&testTag},
+	}
+	testMemeNoTag := Meme{
+		Name: "no tag",
+	}
+	database := connectDB()
+	testModel := MemesModel{
+		DB: database,
+	}
+	res := testModel.Create(&testMemeWithTag)
+	if res.Error != nil {
+		t.Errorf("Failed to create test meme with tag: %s", res.Error)
+	}
+	res = testModel.Create(&testMemeNoTag)
+	if res.Error != nil {
+		t.Errorf("Failed to create test meme without tag: %s", res.Error)
+	}
+
+	actual, err := testModel.GetUntagged()
+	if err != nil {
+		t.Errorf("Failted to get untagged memes: %s", err)
+	}
+
+	if len(actual) != 1 {
+		t.Errorf("Expected length of meme slice to be 1, but got %d", len(actual))
+	} else {
+		if actual[0].Name != "no tag" {
+			t.Errorf("Expected tag to have name 'no tag', but got %v", actual)
+		}
+	}
+}
+
 func Test_AddTag(t *testing.T) {
 	testTag1 := Tag{
 		Name: "First Tag",

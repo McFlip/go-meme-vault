@@ -89,3 +89,11 @@ When("I select the existing tag", () => {
   cy.get("#modal").findByRole("searchbox").type("first");
   cy.get("#modal").findByRole("button", { name: "first tag" }).click();
 });
+
+When("I navigate to the untagged memes page", () => {
+  cy.get("menu").findByRole("link", { name: "Untagged Memes" }).click();
+});
+
+Then("I should the remaining memes that have not been tagged", () => {
+  cy.get("main").findAllByRole("img").should("have.length", 3);
+});
