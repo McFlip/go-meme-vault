@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -188,6 +189,11 @@ func main() {
 
 		tags, err := tagsModel.Search(qStr)
 		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				noTag := "<p>No tag found</p>"
+				w.Write([]byte(noTag))
+				return
+			}
 			respondWithErr(w, 500, err.Error())
 			return
 		}
