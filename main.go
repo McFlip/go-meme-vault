@@ -175,8 +175,11 @@ func main() {
 	})
 
 	r.Post("/tags/search", func(w http.ResponseWriter, r *http.Request) {
-		// qStr := r.URL.Query().Get("q")
 		qStr := r.PostFormValue("search")
+		if qStr == "" {
+			w.WriteHeader(200)
+			return
+		}
 		memeIdStr := r.PostFormValue("memeId")
 		memeId := 0
 		if memeIdStr != "" {
