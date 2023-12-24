@@ -57,7 +57,19 @@ func main() {
 		if err != nil {
 			respondWithErr(w, 500, "Error getting all tags")
 		}
-		components.Index(allTags).Render(r.Context(), w)
+		idxComponent := components.Index(allTags)
+		isHtmx := false
+		htmxHeader := r.Header["Hx-Request"]
+		if len(htmxHeader) > 0 {
+			if htmxHeader[0] == "true" {
+				isHtmx = true
+			}
+		}
+		if isHtmx {
+			idxComponent.Render(r.Context(), w)
+		} else {
+			components.Layout(idxComponent).Render(r.Context(), w)
+		}
 	})
 
 	r.Get("/memes", func(w http.ResponseWriter, r *http.Request) {
