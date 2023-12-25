@@ -10,13 +10,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/McFlip/go-meme-vault/components"
-	"github.com/McFlip/go-meme-vault/internal/models"
-
 	"github.com/glebarez/sqlite"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"gorm.io/gorm"
+
+	"github.com/McFlip/go-meme-vault/components"
+	"github.com/McFlip/go-meme-vault/internal/models"
 )
 
 type TestHooks struct {
@@ -27,8 +27,8 @@ type errRes struct {
 }
 
 func main() {
-	var dbPath = flag.String("db-path", ":memory:", "path to sqlite file")
-	var p = flag.Int("p", 8080, "port to listen on")
+	dbPath := flag.String("db-path", ":memory:", "path to sqlite file")
+	p := flag.Int("p", 8080, "port to listen on")
 	flag.Parse()
 	port := fmt.Sprintf(":%d", *p)
 	const memePath = "public/img"
@@ -136,12 +136,12 @@ func main() {
 		}
 	})
 
-	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/memes/new", func(w http.ResponseWriter, _ *http.Request) {
 		tmpl := template.Must(template.ParseFiles("templates/new_memes.html"))
 		tmpl.Execute(w, nil)
 	})
 
-	r.Post("/memes/scan", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/memes/scan", func(w http.ResponseWriter, _ *http.Request) {
 		memeFullPath := fmt.Sprintf("%s/full", memePath)
 		freshMemes, err := memesModel.Scan(memeFullPath)
 		if err != nil {
