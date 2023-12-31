@@ -1,0 +1,16 @@
+package components
+
+templ New_Memes() {
+	<div id="new-memes">
+		<h1>Add Memes to Your Collection</h1>
+		<p>
+			Drop your memes into the following path:
+			<pre>public/img/full</pre>
+		</p>
+		<p>Then click on the "Scan" button</p>
+		<form hx-post="/memes/scan" hx-target="#memes">
+			<input type="submit" value="Scan"/>
+		</form>
+		<div id="memes">New memes will appear here</div>
+	</div>
+}

@@ -58,14 +58,7 @@ func main() {
 			respondWithErr(w, 500, "Error getting all tags")
 		}
 		idxComponent := components.Index(allTags)
-		isHtmx := false
-		htmxHeader := r.Header["Hx-Request"]
-		if len(htmxHeader) > 0 {
-			if htmxHeader[0] == "true" {
-				isHtmx = true
-			}
-		}
-		if isHtmx {
+		if isHtmx(r) {
 			idxComponent.Render(r.Context(), w)
 		} else {
 			components.Layout(idxComponent).Render(r.Context(), w)
@@ -100,9 +93,17 @@ func main() {
 			memesSlice = append(memesSlice, m)
 		}
 
-		err = components.Memes(tagSlice, memesSlice).Render(r.Context(), w)
-		if err != nil {
-			respondWithErr(w, 500, err.Error())
+		memesComponent := components.Memes(tagSlice, memesSlice)
+		if isHtmx(r) {
+			err := memesComponent.Render(r.Context(), w)
+			if err != nil {
+				respondWithErr(w, 500, err.Error())
+			}
+		} else {
+			err := components.Layout(memesComponent).Render(r.Context(), w)
+			if err != nil {
+				respondWithErr(w, 500, err.Error())
+			}
 		}
 	})
 
@@ -112,9 +113,17 @@ func main() {
 		if err != nil {
 			respondWithErr(w, 500, err.Error())
 		}
-		err = components.Memes(tagSlice, memesSlice).Render(r.Context(), w)
-		if err != nil {
-			respondWithErr(w, 500, err.Error())
+		memesComponent := components.Memes(tagSlice, memesSlice)
+		if isHtmx(r) {
+			err := memesComponent.Render(r.Context(), w)
+			if err != nil {
+				respondWithErr(w, 500, err.Error())
+			}
+		} else {
+			err := components.Layout(memesComponent).Render(r.Context(), w)
+			if err != nil {
+				respondWithErr(w, 500, err.Error())
+			}
 		}
 	})
 
@@ -136,9 +145,13 @@ func main() {
 		}
 	})
 
-	r.Get("/memes/new", func(w http.ResponseWriter, _ *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/new_memes.html"))
-		tmpl.Execute(w, nil)
+	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
+    newMemesComponent := components.New_Memes()
+    if isHtmx(r) {
+      newMemesComponent.Render(r.Context(), w)
+    } else {
+      components.Layout(newMemesComponent).Render(r.Context(), w)
+    }
 	})
 
 	r.Post("/memes/scan", func(w http.ResponseWriter, _ *http.Request) {
@@ -288,7 +301,7 @@ func main() {
 	r.Handle("/public", staticHandler)
 	r.Handle("/public/*", staticHandler)
 
-	log.Printf("🚀 Server launched on localhost%s", port)
+	log.Printf("🚀 Server launched on http://localhost%s", port)
 	log.Printf("💾 Sqlite database saved at: %s", *dbPath)
 	log.Fatal(http.ListenAndServe(port, r))
 }
@@ -324,4 +337,15 @@ func respondWithErr(w http.ResponseWriter, code int, msg string) {
 	}
 	w.WriteHeader(code)
 	w.Write(dat)
+}
+
+func isHtmx(r *http.Request) bool {
+	isHtmx := false
+	htmxHeader := r.Header["Hx-Request"]
+	if len(htmxHeader) > 0 {
+		if htmxHeader[0] == "true" {
+			isHtmx = true
+		}
+	}
+	return isHtmx
 }
