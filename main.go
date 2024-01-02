@@ -50,6 +50,8 @@ func main() {
 	testHooksRtr := chi.NewRouter()
 	testHooksRtr.Delete("/nuke", testHooks.HandleNuke)
 	testHooksRtr.Post("/tags", testHooks.HandleCreateTag)
+	testHooksRtr.Post("/memes", testHooks.HandleCreateMeme)
+	testHooksRtr.Post("/memes/{memeId}/addtag/{tagId}", testHooks.HandleAddTag)
 	r.Mount("/api/testhooks", testHooksRtr)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -70,14 +72,18 @@ func main() {
 		tagIds := qStr["tag"]
 		// log.Println(tagIds)
 		tagSlice := make([]models.Tag, 0, len(tagIds))
+		tagMapBool := make(map[uint]bool)
 		var memesSlice []models.Meme
 		memesMap := make(map[uint]models.Meme)
+		memesCountMap := make(map[uint]int)
+
 		for _, id := range tagIds {
 			id, err := strconv.Atoi(id)
 			if err != nil {
 				respondWithErr(w, 400, "tag query param must be int")
 				return
 			}
+			tagMapBool[uint(id)] = false
 			t, err := tagsModel.GetByID(uint(id))
 			if err != nil {
 				respondWithErr(w, 500, "error getting tag by id")
@@ -85,13 +91,45 @@ func main() {
 			}
 			tagSlice = append(tagSlice, t)
 			for _, m := range t.Memes {
-				log.Println(m)
+				// log.Println(m)
 				memesMap[m.ID] = *m
+				if _, ok := memesCountMap[m.ID]; ok {
+					memesCountMap[m.ID] = memesCountMap[m.ID] + 1
+				} else {
+					memesCountMap[m.ID] = 1
+				}
 			}
 		}
-		for _, m := range memesMap {
-			memesSlice = append(memesSlice, m)
+		// log.Println(memesCountMap)
+
+		for k, v := range memesCountMap {
+			if v == len(tagSlice) {
+				memesSlice = append(memesSlice, memesMap[k])
+			}
 		}
+
+		/*
+				for _, m := range memesMap {
+		      hasAllTags := false
+		      for t := range tagMapBool {
+		        tagMapBool[t] = false
+		      }
+		      for _, t := range m.Tags {
+		        log.Println("FUBAR")
+		        log.Println(t)
+		        log.Println(tagMapBool)
+		        if v, ok := tagMapBool[t.ID]; ok {
+		          v = true
+		          log.Printf("v: %v, map: %v", v, tagMapBool[t.ID])
+		          tagMapBool[t.ID] = true
+		        }
+		      }
+		      for _, t := range tagMapBool {
+		        hasAllTags = hasAllTags && t
+		      }
+		      if hasAllTags {memesSlice = append(memesSlice, m)}
+				}
+		*/
 
 		memesComponent := components.Memes(tagSlice, memesSlice)
 		if isHtmx(r) {
@@ -146,12 +184,12 @@ func main() {
 	})
 
 	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
-    newMemesComponent := components.New_Memes()
-    if isHtmx(r) {
-      newMemesComponent.Render(r.Context(), w)
-    } else {
-      components.Layout(newMemesComponent).Render(r.Context(), w)
-    }
+		newMemesComponent := components.New_Memes()
+		if isHtmx(r) {
+			newMemesComponent.Render(r.Context(), w)
+		} else {
+			components.Layout(newMemesComponent).Render(r.Context(), w)
+		}
 	})
 
 	r.Post("/memes/scan", func(w http.ResponseWriter, _ *http.Request) {
@@ -325,6 +363,51 @@ func (hooks *TestHooks) HandleCreateTag(w http.ResponseWriter, r *http.Request) 
 	}
 	tagsModel.Create(&tag)
 	w.WriteHeader(200)
+}
+
+func (hooks *TestHooks) HandleCreateMeme(w http.ResponseWriter, r *http.Request) {
+	var meme models.Meme
+	memesModel := models.MemesModel{DB: hooks.DB}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&meme)
+	if err != nil {
+		respondWithErr(w, 500, "unable to decode meme")
+		return
+	}
+	memesModel.Create(&meme)
+	w.WriteHeader(200)
+}
+
+func (hooks *TestHooks) HandleAddTag(w http.ResponseWriter, r *http.Request) {
+	tagsModel := models.TagsModel{DB: hooks.DB}
+	memesModel := models.MemesModel{DB: hooks.DB}
+	memeId, err := strconv.Atoi(chi.URLParam(r, "memeId"))
+	if err != nil {
+		respondWithErr(w, 400, "memeId must be an int")
+		return
+	}
+	tagId, err := strconv.Atoi(chi.URLParam(r, "tagId"))
+	if err != nil {
+		respondWithErr(w, 400, "tagId must be an int")
+		return
+	}
+
+	tag, err := tagsModel.GetByID(uint(tagId))
+	if err != nil {
+		respondWithErr(w, 500, err.Error())
+	}
+	meme, err := memesModel.AddTag(uint(memeId), tag)
+	respondWithJSON(w, 200, meme)
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	dat, err := json.Marshal(payload)
+	if err != nil {
+		respondWithErr(w, 500, fmt.Sprintf("Error marshaling json in respondWithJSON: %s", err))
+		return
+	}
+	w.WriteHeader(code)
+	w.Write(dat)
 }
 
 func respondWithErr(w http.ResponseWriter, code int, msg string) {
