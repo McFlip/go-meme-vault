@@ -3,14 +3,14 @@ package components
 import "github.com/McFlip/go-meme-vault/internal/models"
 
 templ MemesList(memes []models.Meme) {
-  <div>
-    <div id="modal"></div>
-    <ul>
-      for _, meme := range memes {
-        <li>
-          @MemeTn(meme)
-        </li>
-      }
-    </ul>
-  </div>
+	<div>
+		<div id="modal"></div>
+		<ul>
+			for _, meme := range memes {
+				<li>
+					@MemeTn(meme)
+				</li>
+			}
+		</ul>
+	</div>
 }

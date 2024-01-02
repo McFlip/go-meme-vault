@@ -7,12 +7,12 @@ type TagParams struct {
 }
 
 templ Tag(params TagParams) {
-  <li>
-    <form hx-delete={fmt.Sprintf("/memes/%s/tags/%s", params.MemeId, params.TagId)} hx-target="closest li" hx-confirm="remove tag?" hx-swap="outerHTML">
-      <input name="meme_id" hidden readonly value={params.MemeId} />
-      <input name="tag_id" hidden readonly value={params.TagId} />
-      <span>{params.Name}</span>
-      <input type="submit" value="X" />
-    </form>
-  </li>
+	<li>
+		<form hx-delete={ fmt.Sprintf("/memes/%s/tags/%s", params.MemeId, params.TagId) } hx-target="closest li" hx-confirm="remove tag?" hx-swap="outerHTML">
+			<input name="meme_id" hidden readonly value={ params.MemeId }/>
+			<input name="tag_id" hidden readonly value={ params.TagId }/>
+			<span>{ params.Name }</span>
+			<input type="submit" value="X"/>
+		</form>
+	</li>
 }
