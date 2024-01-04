@@ -72,7 +72,8 @@ func main() {
 		tagIds := qStr["tag"]
 		// log.Println(tagIds)
 		tagSlice := make([]models.Tag, 0, len(tagIds))
-		tagMapBool := make(map[uint]bool)
+		tagSet := make(map[uint]bool)
+		tagCountMap := make(map[uint]int)
 		var memesSlice []models.Meme
 		memesMap := make(map[uint]models.Meme)
 		memesCountMap := make(map[uint]int)
@@ -83,7 +84,7 @@ func main() {
 				respondWithErr(w, 400, "tag query param must be int")
 				return
 			}
-			tagMapBool[uint(id)] = false
+			tagSet[uint(id)] = true
 			t, err := tagsModel.GetByID(uint(id))
 			if err != nil {
 				respondWithErr(w, 500, "error getting tag by id")
@@ -103,35 +104,46 @@ func main() {
 		// log.Println(memesCountMap)
 
 		for k, v := range memesCountMap {
+			// log.Printf("***Count: %v", v)
 			if v == len(tagSlice) {
 				memesSlice = append(memesSlice, memesMap[k])
 			}
 		}
 
-		/*
-				for _, m := range memesMap {
-		      hasAllTags := false
-		      for t := range tagMapBool {
-		        tagMapBool[t] = false
-		      }
-		      for _, t := range m.Tags {
-		        log.Println("FUBAR")
-		        log.Println(t)
-		        log.Println(tagMapBool)
-		        if v, ok := tagMapBool[t.ID]; ok {
-		          v = true
-		          log.Printf("v: %v, map: %v", v, tagMapBool[t.ID])
-		          tagMapBool[t.ID] = true
-		        }
-		      }
-		      for _, t := range tagMapBool {
-		        hasAllTags = hasAllTags && t
-		      }
-		      if hasAllTags {memesSlice = append(memesSlice, m)}
-				}
-		*/
+		for _, m := range memesSlice {
+			meme, err := memesModel.GetByID(m.ID)
+			if err != nil {
+				respondWithErr(w, 500, "error looking up meme by id")
+				return
+			}
 
-		memesComponent := components.Memes(tagSlice, memesSlice)
+			for _, t := range meme.Tags {
+				// log.Println(t)
+				if _, ok := tagSet[t.ID]; !ok {
+					if _, ok := tagCountMap[t.ID]; ok {
+						tagCountMap[t.ID] = tagCountMap[t.ID] + 1
+					} else {
+						tagCountMap[t.ID] = 1
+					}
+				}
+			}
+		}
+
+		log.Println(tagCountMap)
+		availableTags := make([]models.Tag, 0, len(tagCountMap))
+		for k, v := range tagCountMap {
+			if v >= len(memesSlice) {
+				continue
+			}
+			tag, err := tagsModel.GetByID(k)
+			if err != nil {
+				respondWithErr(w, 500, "error looking up tag by id")
+				return
+			}
+			availableTags = append(availableTags, tag)
+		}
+
+		memesComponent := components.Memes(tagSlice, memesSlice, availableTags)
 		if isHtmx(r) {
 			err := memesComponent.Render(r.Context(), w)
 			if err != nil {
@@ -147,11 +159,12 @@ func main() {
 
 	r.Get("/memes/untagged", func(w http.ResponseWriter, r *http.Request) {
 		var tagSlice []models.Tag
+		var noAvailable []models.Tag
 		memesSlice, err := memesModel.GetUntagged()
 		if err != nil {
 			respondWithErr(w, 500, err.Error())
 		}
-		memesComponent := components.Memes(tagSlice, memesSlice)
+		memesComponent := components.Memes(tagSlice, memesSlice, noAvailable)
 		if isHtmx(r) {
 			err := memesComponent.Render(r.Context(), w)
 			if err != nil {

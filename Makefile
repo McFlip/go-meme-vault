@@ -1,14 +1,28 @@
 .PHONY: clean
 
-bdd-run : test.exe
+bdd-run : clean test.exe
 ifdef spec
-	cd bdd_tests; pnpx cypress run --spec cypress/e2e/${spec}/${spec}.feature
+	./test.exe & export SERVER_PID=$$!; cd bdd_tests; pnpx cypress run --spec cypress/e2e/${spec}/${spec}.feature; kill $${SERVER_PID}
 else
-	cd bdd_tests; pnpx cypress run
+	./test.exe & export SERVER_PID=$$!; cd bdd_tests; pnpx cypress run; kill $${SERVER_PID}
 endif
 
-test.exe :
+bdd-open : clean test.exe
+	./test.exe & export SERVER_PID=$$!; cd bdd_tests; pnpx cypress open; kill $${SERVER_PID}
+
+test.exe : templ
 	go build -o test.exe
 
+dev : clean templ
+	air
+
+build : clean templ
+	go build
+	# TODO: bundle static assets and folder struct
+	# vendor tailwind, htmx, & alpine js
+
+templ :
+	templ generate
+
 clean :
-	rm *.exe dev.db
+	-rm *.exe dev.db

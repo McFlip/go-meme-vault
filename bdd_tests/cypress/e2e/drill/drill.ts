@@ -12,18 +12,6 @@ Given("I am on the home page", () => {
 Given("There are four memes all with the tag four", () => {
   cy.visit("http://localhost:8080/memes/new");
   cy.findByRole("button", { name: "Scan" }).click();
-  /*
-  cy.get("main")
-    .findAllByRole("img")
-    .each(($el, index, $list) => {
-      cy.wrap($el)
-        .should("have.attr", "src")
-        .and("match", /public\/img\/tn\//);
-    })
-    .then(($list) => {
-      expect($list).to.have.length(4);
-    });
-  */
 
   const tag = {name: "4"}
   cy.request('POST', 'http://localhost:8080/api/testhooks/tags', tag)
@@ -32,12 +20,6 @@ Given("There are four memes all with the tag four", () => {
   }
 })
 
-/*
-  *
-    And 3 of those memes have the tag '3'
-    And 2 of those memes have the tag '2'
-    And 1 of those memes has the tag '1'
-*/
 Given("3 of those memes have the tag '3'", () => {
   const tag = {name: "3"}
   cy.request('POST', 'http://localhost:8080/api/testhooks/tags', tag)

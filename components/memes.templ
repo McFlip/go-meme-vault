@@ -17,6 +17,17 @@ func tagUrl(tags []models.Tag, availableTag models.Tag) string {
 	return fmt.Sprintf("%s?%s", baseUrl, qStr.Encode())
 }
 
+func selectedTagUrl(tags []models.Tag, selectedTag models.Tag) string {
+	baseUrl := "/memes"
+	qStr := url.Values{}
+	for _, t := range tags {
+		if t.ID != selectedTag.ID {
+			qStr.Add("tag", strconv.Itoa(int(t.ID)))
+		}
+	}
+	return fmt.Sprintf("%s?%s", baseUrl, qStr.Encode())
+}
+
 templ Memes(tags []models.Tag, memes []models.Meme, availableTags []models.Tag) {
 	<div>
 		<h1>MEMES</h1>
@@ -24,7 +35,9 @@ templ Memes(tags []models.Tag, memes []models.Meme, availableTags []models.Tag) 
 			<h2>Selected Tags</h2>
 			<ul>
 				for _, tag := range tags {
-					<li>{ tag.Name }</li>
+					<li>
+						<a hx-target="main" href={ templ.SafeURL(selectedTagUrl(tags, tag)) }>{ tag.Name }</a>
+					</li>
 				}
 			</ul>
 		</div>
