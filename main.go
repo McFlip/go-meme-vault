@@ -410,6 +410,10 @@ func (hooks *TestHooks) HandleAddTag(w http.ResponseWriter, r *http.Request) {
 		respondWithErr(w, 500, err.Error())
 	}
 	meme, err := memesModel.AddTag(uint(memeId), tag)
+	if err != nil {
+		respondWithErr(w, 500, err.Error())
+	}
+
 	respondWithJSON(w, 200, meme)
 }
 
