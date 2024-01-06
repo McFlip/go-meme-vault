@@ -3,7 +3,7 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  args_bin = ["--db-path", "dev.db"]
+#args_bin = ["--db-path", "dev.db"]
   bin = "./tmp/main"
   cmd = "templ generate && go build -o ./tmp/main ."
   delay = 1000

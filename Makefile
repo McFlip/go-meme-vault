@@ -25,4 +25,4 @@ templ :
 	templ generate
 
 clean :
-	-rm *.exe dev.db
+	-rm *.exe dev.db public/img/tn/*.jpg

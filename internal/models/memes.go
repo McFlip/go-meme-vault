@@ -79,7 +79,12 @@ func (memesModel *MemesModel) Scan(path string) ([]Meme, error) {
 					return err
 				}
 				thumbnail := makeThumb(src, Tn_Width)
-				imaging.Save(thumbnail, newMeme.GetThumbnail())
+				err = imaging.Save(thumbnail, newMeme.GetThumbnail()[1:])
+				// log.Println("***FRESH MEME***")
+				// log.Println(newMeme.GetThumbnail())
+				if err != nil {
+					return err
+				}
 				// append new meme to list
 				memes = append(memes, newMeme)
 			} else if err != nil {
@@ -102,7 +107,8 @@ func (memesModel *MemesModel) GetAll() ([]Meme, error) {
 
 func (memesModel *MemesModel) GetUntagged() ([]Meme, error) {
 	var memes []Meme
-	res := memesModel.DB.Raw("select * from memes where id not in (select distinct meme_id from meme_tags)").Scan(&memes)
+	res := memesModel.DB.Raw("select * from memes where id not in (select distinct meme_id from meme_tags)").
+		Scan(&memes)
 	return memes, res.Error
 }
 
