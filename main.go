@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -205,7 +204,7 @@ func main() {
 		}
 	})
 
-	r.Post("/memes/scan", func(w http.ResponseWriter, _ *http.Request) {
+	r.Post("/memes/scan", func(w http.ResponseWriter, r *http.Request) {
 		memeFullPath := fmt.Sprintf("%s/full", memePath)
 		freshMemes, err := memesModel.Scan(memeFullPath)
 		if err != nil {
@@ -213,9 +212,7 @@ func main() {
 			return
 		}
 
-		tmplFiles := []string{"templates/memes_list.html", "templates/partials/meme_tn.html"}
-		tmpl := template.Must(template.ParseFiles(tmplFiles...))
-		tmpl.Execute(w, freshMemes)
+		components.MemesList(freshMemes).Render(r.Context(), w)
 	})
 
 	r.Post("/tags", func(w http.ResponseWriter, r *http.Request) {
