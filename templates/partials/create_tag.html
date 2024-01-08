@@ -1,8 +1,0 @@
-{{ define "create_tag" }}
-<form hx-post="/tags" hx-target="#tags" hx-swap="beforeend">
-  <input hidden name="memeId" readonly value="{{.ID}}" />
-  <label for="search_str">Search for or create tag</label>
-  <input type="search" id="search_str" name="search_str" placeholder="New Tag" />
-  <button type="submit">Create</button>
-</form>
-{{ end }}
