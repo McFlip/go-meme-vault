@@ -28,3 +28,6 @@ screenshots/
 
 # Test DB
 *.db
+
+# Generated thumbnails
+public/img/tn/
