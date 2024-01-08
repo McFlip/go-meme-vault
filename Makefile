@@ -17,12 +17,26 @@ dev : clean templ
 	air
 
 build : clean templ
-	go build
+	env GOOS=linux GOARCH=amd64 go build -o build/go-meme-vault
+	env GOOS=windows GOARCH=amd64 go build -o build/go-meme-vault.exe
 	# TODO: bundle static assets and folder struct
 	# vendor tailwind, htmx, & alpine js
+	rm dist/public/img/full/.gitkeep
+	rm dist/public/img/tn/.gitkeep
+	ln -s build/go-meme-vault dist/go-meme-vault
+	tar czf release/linux.tar.gz dist
+	unlink dist/go-meme-vault
+	ln build/go-meme-vault.exe dist/go-meme-vault.exe
+	zip -r release/windows.zip dist
+	unlink dist/go-meme-vault.exe
+	touch dist/public/img/full/.gitkeep
+	touch dist/public/img/tn/.gitkeep
 
 templ :
 	templ generate
 
 clean :
 	-rm *.exe dev.db public/img/tn/*.jpg
+	-rm dist/go-meme-vault
+	-rm dist/go-meme-vault.exe
+	-rm release/*
