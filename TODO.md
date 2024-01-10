@@ -4,7 +4,7 @@
 
 ### Searchbar
 
-[] Only 1 result is returned / displayed
+[X] Only 1 result is returned / displayed
 [] Can create empty tag
 [] Can create duplicate tag
 
