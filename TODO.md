@@ -6,7 +6,7 @@
 
 [X] Only 1 result is returned / displayed
 [X] Can create empty tag
-[] Can create duplicate tag
+[X] Can create duplicate tag
 
 ### Scan for new memes
 

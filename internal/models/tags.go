@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -37,4 +38,10 @@ func (tagsModel *TagsModel) Search(q string) ([]Tag, error) {
 	var tags []Tag
 	res := tagsModel.DB.Where("Name LIKE ?", fmt.Sprintf("%%%s%%", q)).Find(&tags)
 	return tags, res.Error
+}
+
+func (TagsModel *TagsModel) TagExists(name string) (Tag, bool) {
+	var tag Tag
+	res := TagsModel.DB.Where("Name = ?", name).First(&tag)
+	return tag, !errors.Is(res.Error, gorm.ErrRecordNotFound)
 }

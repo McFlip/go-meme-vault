@@ -231,16 +231,30 @@ func main() {
 			respondWithErr(w, 404, "missing meme ref")
 			return
 		}
-
+		// tag := models.Tag{}
 		tag := models.Tag{
 			Name:  name,
 			Memes: []*models.Meme{&meme},
 		}
-		res := tagsModel.Create(&tag)
-		if res.Error != nil {
-			respondWithErr(w, 500, res.Error.Error())
-			return
+
+		if existingTag, ok := tagsModel.TagExists(name); ok {
+			// add tag to meme
+			_, err := memesModel.AddTag(uint(memeId), existingTag)
+			if err != nil {
+				respondWithErr(w, 500, err.Error())
+				return
+			}
+			// tag.Name = name
+			tag.ID = existingTag.ID
+		} else {
+			// create new tag
+			res := tagsModel.Create(&tag)
+			if res.Error != nil {
+				respondWithErr(w, 500, res.Error.Error())
+				return
+			}
 		}
+
 		newTag := components.TagParams{
 			MemeId: strconv.Itoa(int(meme.ID)),
 			TagId:  strconv.Itoa(int(tag.ID)),
