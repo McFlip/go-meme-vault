@@ -221,6 +221,11 @@ func main() {
 			respondWithErr(w, 400, "bad form data")
 			return
 		}
+		name := r.PostFormValue("search")
+		if name == "" {
+			respondWithErr(w, 400, "bad form data")
+			return
+		}
 		meme, err := memesModel.GetByID(uint(memeId))
 		if err != nil {
 			respondWithErr(w, 404, "missing meme ref")
@@ -228,7 +233,7 @@ func main() {
 		}
 
 		tag := models.Tag{
-			Name:  r.PostFormValue("search"),
+			Name:  name,
 			Memes: []*models.Meme{&meme},
 		}
 		res := tagsModel.Create(&tag)

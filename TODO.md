@@ -5,7 +5,7 @@
 ### Searchbar
 
 [X] Only 1 result is returned / displayed
-[] Can create empty tag
+[X] Can create empty tag
 [] Can create duplicate tag
 
 ### Scan for new memes
