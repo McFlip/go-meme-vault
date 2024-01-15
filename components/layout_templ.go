@@ -76,7 +76,7 @@ func Layout(child templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main id=\"main\" class=\"flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-600 to-red-900\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main id=\"main\" class=\"flex flex-col justify-center items-center min-h-screen bg-gradient-to-b to-red-900 from-slate-600\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -84,7 +84,33 @@ func Layout(child templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</main></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</main><script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var7 := `
+    document.addEventListener('alpine:init', () => {
+        Alpine.store("memes", {
+            memes: [],
+            setMemes: (m) => {
+                this.memes = m
+              },
+            getNextModalUrl: (i) => {
+                idx = (i + 1) % this.memes.length
+                memeId = this.memes[idx].ID
+                return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
+              }
+          })
+    document.addEventListener('newmemes', (evt) => {
+        Alpine.store("memes").setMemes(evt.detail.memes)
+      })
+      })
+  `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -29,12 +29,12 @@ func MemesList(memes []models.Meme) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, meme := range memes {
+		for i, meme := range memes {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = MemeTn(meme).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = MemeTn(meme, i).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

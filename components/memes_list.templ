@@ -6,9 +6,9 @@ templ MemesList(memes []models.Meme) {
 	<div>
 		<div id="modal"></div>
 		<ul>
-			for _, meme := range memes {
+			for i, meme := range memes {
 				<li>
-					@MemeTn(meme)
+					@MemeTn(meme, i)
 				</li>
 			}
 		</ul>

@@ -178,6 +178,8 @@ func main() {
 	})
 
 	r.Get("/memes/{memeId}", func(w http.ResponseWriter, r *http.Request) {
+		qStr := r.URL.Query()
+		idx := qStr["idx"]
 		memeId := chi.URLParam(r, "memeId")
 		id, err := strconv.Atoi(memeId)
 		if err != nil {
@@ -189,7 +191,7 @@ func main() {
 			respondWithErr(w, 500, "error getting meme by id")
 			return
 		}
-		err = components.MemeModal(meme).Render(r.Context(), w)
+		err = components.MemeModal(meme, idx[0]).Render(r.Context(), w)
 		if err != nil {
 			respondWithErr(w, 500, err.Error())
 		}
@@ -212,6 +214,40 @@ func main() {
 			return
 		}
 
+		// send JSON array of ID's for the Alpine store
+		// example JSON `{"newmemes": {"memes": [ {"ID": 1}, {"ID": 2} ]}}`
+		type memeId struct {
+			ID uint `json:"ID"`
+		}
+		type memesObj struct {
+			Memes []memeId `json:"memes"`
+		}
+		type newmemes struct {
+			Newmemes memesObj `json:"newmemes"`
+		}
+
+		var memesSlice []memeId
+		for _, m := range freshMemes {
+			meme := memeId{
+				ID: m.ID,
+			}
+			memesSlice = append(memesSlice, meme)
+		}
+		memes := memesObj{
+			Memes: memesSlice,
+		}
+		hxTrigger := newmemes{
+			Newmemes: memes,
+		}
+
+		data, err := json.Marshal(hxTrigger)
+		if err != nil {
+			respondWithErr(w, 500, fmt.Sprintf("Error marshaling json in memes/scan: %s", err))
+			return
+		}
+		hxTriggerVal := string(data)
+		w.Header().Add("Hx-Trigger", hxTriggerVal)
+
 		components.MemesList(freshMemes).Render(r.Context(), w)
 	})
 
@@ -231,7 +267,7 @@ func main() {
 			respondWithErr(w, 404, "missing meme ref")
 			return
 		}
-		// tag := models.Tag{}
+
 		tag := models.Tag{
 			Name:  name,
 			Memes: []*models.Meme{&meme},
@@ -244,7 +280,6 @@ func main() {
 				respondWithErr(w, 500, err.Error())
 				return
 			}
-			// tag.Name = name
 			tag.ID = existingTag.ID
 		} else {
 			// create new tag
