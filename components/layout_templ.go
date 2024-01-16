@@ -10,7 +10,26 @@ import "context"
 import "io"
 import "bytes"
 
-func Layout(child templ.Component) templ.Component {
+import "github.com/McFlip/go-meme-vault/internal/models"
+
+func loadMemes(memes []models.Meme) templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_loadMemes_2757`,
+		Function: `function __templ_loadMemes_2757(memes){if(memes){
+    Alpine.store("memes", {
+      memes: memes.map(m => ( {ID: m.ID} )),
+      getNextModalUrl: (i) => {
+        idx = (i + 1) % Alpine.store("memes").memes.length
+        memeId = Alpine.store("memes").memes[idx].ID
+        return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
+      }
+    })
+  }}`,
+		Call: templ.SafeScript(`__templ_loadMemes_2757`, memes),
+	}
+}
+
+func Layout(child templ.Component, memes []models.Meme) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -50,7 +69,7 @@ func Layout(child templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script><script defer src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script><script src=\"https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -68,7 +87,24 @@ func Layout(child templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title></head><body hx-boost=\"true\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title></head>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, loadMemes(memes))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body hx-boost=\"true\" onload=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 templ.ComponentScript = loadMemes(memes)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7.Call)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,25 +124,23 @@ func Layout(child templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var7 := `
-    document.addEventListener('alpine:init', () => {
+		templ_7745c5c3_Var8 := `
+      document.addEventListener('newmemes', (evt) => {
         Alpine.store("memes", {
-            memes: [],
-            setMemes: (m) => {
-                this.memes = m
-              },
-            getNextModalUrl: (i) => {
-                idx = (i + 1) % this.memes.length
-                memeId = this.memes[idx].ID
-                return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
-              }
-          })
-    document.addEventListener('newmemes', (evt) => {
+          memes: evt.detail.memes,
+          setMemes: (m) => {
+              this.memes = m
+            },
+          getNextModalUrl: (i) => {
+              idx = (i + 1) % this.memes.length
+              memeId = this.memes[idx].ID
+              return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
+          }
+        })
         Alpine.store("memes").setMemes(evt.detail.memes)
       })
-      })
-  `
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+    `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

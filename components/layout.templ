@@ -1,6 +1,21 @@
 package components
 
-templ Layout(child templ.Component) {
+import "github.com/McFlip/go-meme-vault/internal/models"
+
+script loadMemes(memes []models.Meme) {
+  if(memes){
+    Alpine.store("memes", {
+      memes: memes.map(m => ( {ID: m.ID} )),
+      getNextModalUrl: (i) => {
+        idx = (i + 1) % Alpine.store("memes").memes.length
+        memeId = Alpine.store("memes").memes[idx].ID
+        return `/memes/${memeId}?idx=${idx}`
+      }
+    })
+  }
+}
+
+templ Layout(child templ.Component, memes []models.Meme) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -9,10 +24,10 @@ templ Layout(child templ.Component) {
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.6"></script>
-			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 			<title>Go Meme Vault</title>
 		</head>
-		<body hx-boost="true">
+		<body hx-boost="true" onload={ loadMemes(memes) }>
 			@Menu()
 			<main
 				id="main"
@@ -21,23 +36,21 @@ templ Layout(child templ.Component) {
 				@child
 			</main>
 			<script>
-    document.addEventListener('alpine:init', () => {
+      document.addEventListener('newmemes', (evt) => {
         Alpine.store("memes", {
-            memes: [],
-            setMemes: (m) => {
-                this.memes = m
-              },
-            getNextModalUrl: (i) => {
-                idx = (i + 1) % this.memes.length
-                memeId = this.memes[idx].ID
-                return `/memes/${memeId}?idx=${idx}`
-              }
-          })
-    document.addEventListener('newmemes', (evt) => {
+          memes: evt.detail.memes,
+          setMemes: (m) => {
+              this.memes = m
+            },
+          getNextModalUrl: (i) => {
+              idx = (i + 1) % this.memes.length
+              memeId = this.memes[idx].ID
+              return `/memes/${memeId}?idx=${idx}`
+          }
+        })
         Alpine.store("memes").setMemes(evt.detail.memes)
       })
-      })
-  </script>
+    </script>
 		</body>
 	</html>
 }

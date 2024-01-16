@@ -25,6 +25,16 @@ type errRes struct {
 	Err string `json:"error"`
 }
 
+type memeId struct {
+	ID uint `json:"ID"`
+}
+type memesObj struct {
+	Memes []memeId `json:"memes"`
+}
+type newmemes struct {
+	Newmemes memesObj `json:"newmemes"`
+}
+
 func main() {
 	dbPath := flag.String("db-path", ":memory:", "path to sqlite file")
 	p := flag.Int("p", 8080, "port to listen on")
@@ -62,7 +72,8 @@ func main() {
 		if isHtmx(r) {
 			idxComponent.Render(r.Context(), w)
 		} else {
-			components.Layout(idxComponent).Render(r.Context(), w)
+			var noMemes []models.Meme
+			components.Layout(idxComponent, noMemes).Render(r.Context(), w)
 		}
 	})
 
@@ -149,7 +160,7 @@ func main() {
 				respondWithErr(w, 500, err.Error())
 			}
 		} else {
-			err := components.Layout(memesComponent).Render(r.Context(), w)
+			err := components.Layout(memesComponent, memesSlice).Render(r.Context(), w)
 			if err != nil {
 				respondWithErr(w, 500, err.Error())
 			}
@@ -163,6 +174,14 @@ func main() {
 		if err != nil {
 			respondWithErr(w, 500, err.Error())
 		}
+
+		hxTriggerVal, err := newMemesToJson(memesSlice)
+		if err != nil {
+			respondWithErr(w, 500, fmt.Sprintf("Error marshaling json in memes/scan: %s", err))
+			return
+		}
+		w.Header().Add("Hx-Trigger", hxTriggerVal)
+
 		memesComponent := components.Memes(tagSlice, memesSlice, noAvailable)
 		if isHtmx(r) {
 			err := memesComponent.Render(r.Context(), w)
@@ -170,7 +189,7 @@ func main() {
 				respondWithErr(w, 500, err.Error())
 			}
 		} else {
-			err := components.Layout(memesComponent).Render(r.Context(), w)
+			err := components.Layout(memesComponent, memesSlice).Render(r.Context(), w)
 			if err != nil {
 				respondWithErr(w, 500, err.Error())
 			}
@@ -202,7 +221,8 @@ func main() {
 		if isHtmx(r) {
 			newMemesComponent.Render(r.Context(), w)
 		} else {
-			components.Layout(newMemesComponent).Render(r.Context(), w)
+			var noMemes []models.Meme
+			components.Layout(newMemesComponent, noMemes).Render(r.Context(), w)
 		}
 	})
 
@@ -214,38 +234,11 @@ func main() {
 			return
 		}
 
-		// send JSON array of ID's for the Alpine store
-		// example JSON `{"newmemes": {"memes": [ {"ID": 1}, {"ID": 2} ]}}`
-		type memeId struct {
-			ID uint `json:"ID"`
-		}
-		type memesObj struct {
-			Memes []memeId `json:"memes"`
-		}
-		type newmemes struct {
-			Newmemes memesObj `json:"newmemes"`
-		}
-
-		var memesSlice []memeId
-		for _, m := range freshMemes {
-			meme := memeId{
-				ID: m.ID,
-			}
-			memesSlice = append(memesSlice, meme)
-		}
-		memes := memesObj{
-			Memes: memesSlice,
-		}
-		hxTrigger := newmemes{
-			Newmemes: memes,
-		}
-
-		data, err := json.Marshal(hxTrigger)
+		hxTriggerVal, err := newMemesToJson(freshMemes)
 		if err != nil {
 			respondWithErr(w, 500, fmt.Sprintf("Error marshaling json in memes/scan: %s", err))
 			return
 		}
-		hxTriggerVal := string(data)
 		w.Header().Add("Hx-Trigger", hxTriggerVal)
 
 		components.MemesList(freshMemes).Render(r.Context(), w)
@@ -499,4 +492,28 @@ func isHtmx(r *http.Request) bool {
 		}
 	}
 	return isHtmx
+}
+
+// send JSON array of ID's for the Alpine store
+// example JSON `{"newmemes": {"memes": [ {"ID": 1}, {"ID": 2} ]}}`
+
+func newMemesToJson(freshMemes []models.Meme) (string, error) {
+	var memesSlice []memeId
+	for _, m := range freshMemes {
+		meme := memeId{
+			ID: m.ID,
+		}
+		memesSlice = append(memesSlice, meme)
+	}
+	memes := memesObj{
+		Memes: memesSlice,
+	}
+	data, err := json.Marshal(newmemes{
+		Newmemes: memes,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
