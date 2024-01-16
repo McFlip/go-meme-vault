@@ -6,7 +6,7 @@ import "fmt"
 
 templ MemeModal(meme models.Meme, idx string) {
 	<div x-data="{showModal: true}" class="flex relative z-10" aria-labelledby="meme" role="dialog" aria-modal="true">
-		<div x-show="showModal" class="overflow-y-auto fixed inset-8 z-10 justify-center items-center bg-slate-700" @click.outside="showModal = false">
+		<div x-show="showModal" x-trap="showModal" class="overflow-y-auto fixed inset-8 z-10 justify-center items-center bg-slate-700" @click.outside="showModal = false">
 			<div class="inset-8">
 				<div class="flex justify-between items-center p-4 bg-red-800 rounded-t border-b md:p-5 dark:border-gray-600">
 					<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
@@ -22,7 +22,7 @@ templ MemeModal(meme models.Meme, idx string) {
 						<span class="sr-only">close</span>
 					</button>
 				</div>
-				<div>
+				<div @keyup.z.window="document.getElementById('create').focus()">
 					@CreateTag(meme)
 				</div>
 				<div>

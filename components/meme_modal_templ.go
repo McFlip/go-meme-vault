@@ -27,7 +27,7 @@ func MemeModal(meme models.Meme, idx string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div x-data=\"{showModal: true}\" class=\"flex relative z-10\" aria-labelledby=\"meme\" role=\"dialog\" aria-modal=\"true\"><div x-show=\"showModal\" class=\"overflow-y-auto fixed inset-8 z-10 justify-center items-center bg-slate-700\" @click.outside=\"showModal = false\"><div class=\"inset-8\"><div class=\"flex justify-between items-center p-4 bg-red-800 rounded-t border-b md:p-5 dark:border-gray-600\"><h3 class=\"text-xl font-semibold text-gray-900 dark:text-white\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div x-data=\"{showModal: true}\" class=\"flex relative z-10\" aria-labelledby=\"meme\" role=\"dialog\" aria-modal=\"true\"><div x-show=\"showModal\" x-trap=\"showModal\" class=\"overflow-y-auto fixed inset-8 z-10 justify-center items-center bg-slate-700\" @click.outside=\"showModal = false\"><div class=\"inset-8\"><div class=\"flex justify-between items-center p-4 bg-red-800 rounded-t border-b md:p-5 dark:border-gray-600\"><h3 class=\"text-xl font-semibold text-gray-900 dark:text-white\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,7 +62,7 @@ func MemeModal(meme models.Meme, idx string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></button></div><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></button></div><div @keyup.z.window=\"document.getElementById(&#39;create&#39;).focus()\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
