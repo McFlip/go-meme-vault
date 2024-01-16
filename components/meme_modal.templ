@@ -12,7 +12,7 @@ templ MemeModal(meme models.Meme, idx string) {
 					<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
 						View Meme
 					</h3>
-					<button :hx-get={ fmt.Sprintf("$store.memes.getNextModalUrl(%s)", idx) } hx-target="#modal" class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white">
+					<button :hx-get={ fmt.Sprintf("$store.memes.getNextModalUrl(%s)", idx) } hx-target="#modal" @keyup.right.window="$dispatch('click')" class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white">
 						Next meme
 					</button>
 					<button @click="showModal = false" type="button" class="inline-flex justify-center items-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:text-gray-900 hover:bg-gray-200 ms-auto dark:hover:bg-gray-600 dark:hover:text-white">
