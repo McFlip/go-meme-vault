@@ -16,7 +16,7 @@
 
 ### Meme list
 
-[] Forward / Back navigation in meme modal
+[/] Forward / Back navigation in meme modal - need to implement on "/memes"
 [] Pagination
 
 ### Scan for new memes
