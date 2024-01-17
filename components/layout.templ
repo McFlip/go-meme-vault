@@ -10,6 +10,12 @@ script loadMemes(memes []models.Meme) {
         idx = (i + 1) % Alpine.store("memes").memes.length
         memeId = Alpine.store("memes").memes[idx].ID
         return `/memes/${memeId}?idx=${idx}`
+      },
+      getPrevModalUrl: (i) => {
+        idx = (i - 1) % Alpine.store("memes").memes.length
+        if(idx < 0) idx = Alpine.store("memes").memes.length + idx
+        memeId = Alpine.store("memes").memes[idx].ID
+        return `/memes/${memeId}?idx=${idx}`
       }
     })
   }
@@ -46,6 +52,12 @@ templ Layout(child templ.Component, memes []models.Meme) {
             },
           getNextModalUrl: (i) => {
               idx = (i + 1) % this.memes.length
+              memeId = this.memes[idx].ID
+              return `/memes/${memeId}?idx=${idx}`
+          },
+          getPrevModalUrl: (i) => {
+              idx = (i - 1) % this.memes.length
+              if(idx < 0) idx = this.memes.length + idx
               memeId = this.memes[idx].ID
               return `/memes/${memeId}?idx=${idx}`
           }

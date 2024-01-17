@@ -14,18 +14,24 @@ import "github.com/McFlip/go-meme-vault/internal/models"
 
 func loadMemes(memes []models.Meme) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_loadMemes_2757`,
-		Function: `function __templ_loadMemes_2757(memes){if(memes){
+		Name: `__templ_loadMemes_c139`,
+		Function: `function __templ_loadMemes_c139(memes){if(memes){
     Alpine.store("memes", {
       memes: memes.map(m => ( {ID: m.ID} )),
       getNextModalUrl: (i) => {
         idx = (i + 1) % Alpine.store("memes").memes.length
         memeId = Alpine.store("memes").memes[idx].ID
         return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
+      },
+      getPrevModalUrl: (i) => {
+        idx = (i - 1) % Alpine.store("memes").memes.length
+        if(idx < 0) idx = Alpine.store("memes").memes.length + idx
+        memeId = Alpine.store("memes").memes[idx].ID
+        return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
       }
     })
   }}`,
-		Call: templ.SafeScript(`__templ_loadMemes_2757`, memes),
+		Call: templ.SafeScript(`__templ_loadMemes_c139`, memes),
 	}
 }
 
@@ -151,6 +157,12 @@ func Layout(child templ.Component, memes []models.Meme) templ.Component {
             },
           getNextModalUrl: (i) => {
               idx = (i + 1) % this.memes.length
+              memeId = this.memes[idx].ID
+              return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
+          },
+          getPrevModalUrl: (i) => {
+              idx = (i - 1) % this.memes.length
+              if(idx < 0) idx = this.memes.length + idx
               memeId = this.memes[idx].ID
               return ` + "`" + `/memes/${memeId}?idx=${idx}` + "`" + `
           }
