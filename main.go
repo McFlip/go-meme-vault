@@ -153,18 +153,7 @@ func main() {
 			availableTags = append(availableTags, tag)
 		}
 
-		memesComponent := components.Memes(tagSlice, memesSlice, availableTags)
-		if isHtmx(r) {
-			err := memesComponent.Render(r.Context(), w)
-			if err != nil {
-				respondWithErr(w, 500, err.Error())
-			}
-		} else {
-			err := components.Layout(memesComponent, memesSlice).Render(r.Context(), w)
-			if err != nil {
-				respondWithErr(w, 500, err.Error())
-			}
-		}
+		renderMemes(w, r, memesSlice, tagSlice, availableTags)
 	})
 
 	r.Get("/memes/untagged", func(w http.ResponseWriter, r *http.Request) {
@@ -174,26 +163,7 @@ func main() {
 		if err != nil {
 			respondWithErr(w, 500, err.Error())
 		}
-
-		hxTriggerVal, err := newMemesToJson(memesSlice)
-		if err != nil {
-			respondWithErr(w, 500, fmt.Sprintf("Error marshaling json in memes/scan: %s", err))
-			return
-		}
-		w.Header().Add("Hx-Trigger", hxTriggerVal)
-
-		memesComponent := components.Memes(tagSlice, memesSlice, noAvailable)
-		if isHtmx(r) {
-			err := memesComponent.Render(r.Context(), w)
-			if err != nil {
-				respondWithErr(w, 500, err.Error())
-			}
-		} else {
-			err := components.Layout(memesComponent, memesSlice).Render(r.Context(), w)
-			if err != nil {
-				respondWithErr(w, 500, err.Error())
-			}
-		}
+		renderMemes(w, r, memesSlice, tagSlice, noAvailable)
 	})
 
 	r.Get("/memes/{memeId}", func(w http.ResponseWriter, r *http.Request) {
@@ -516,4 +486,31 @@ func newMemesToJson(freshMemes []models.Meme) (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func renderMemes(
+	w http.ResponseWriter,
+	r *http.Request,
+	memesSlice []models.Meme,
+	selectedTags, availableTags []models.Tag,
+) {
+	hxTriggerVal, err := newMemesToJson(memesSlice)
+	if err != nil {
+		respondWithErr(w, 500, fmt.Sprintf("Error marshaling json in memes/scan: %s", err))
+		return
+	}
+	w.Header().Add("Hx-Trigger", hxTriggerVal)
+
+	memesComponent := components.Memes(selectedTags, memesSlice, availableTags)
+	if isHtmx(r) {
+		err := memesComponent.Render(r.Context(), w)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
+	} else {
+		err := components.Layout(memesComponent, memesSlice).Render(r.Context(), w)
+		if err != nil {
+			respondWithErr(w, 500, err.Error())
+		}
+	}
 }
