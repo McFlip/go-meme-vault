@@ -10,9 +10,6 @@ import "context"
 import "io"
 import "bytes"
 
-// import "github.com/McFlip/go-meme-vault/internal/models"
-// import "fmt"
-
 func Searchbar() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -26,7 +23,7 @@ func Searchbar() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"searchbar\"><form><label for=\"search\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"searchbar\"><form hx-post=\"/tags/search\"><label for=\"search\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -35,7 +32,7 @@ func Searchbar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input id=\"search\" type=\"search\" name=\"search\" placeholder=\"search for tag\" hx-trigger=\"input changed delay:500ms, search\" hx-post=\"/tags/search\" hx-target=\"#search-results\"></form><div id=\"search-results\"></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input id=\"search\" type=\"search\" name=\"search\" placeholder=\"search for tag\" hx-trigger=\"keyup changed delay:500ms\" hx-post=\"/tags/search\" hx-target=\"#search-results\"></form><div id=\"search-results\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
