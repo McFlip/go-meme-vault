@@ -166,25 +166,7 @@ func main() {
 		renderMemes(w, r, memesSlice, tagSlice, noAvailable)
 	})
 
-	r.Get("/memes/{memeId}", func(w http.ResponseWriter, r *http.Request) {
-		qStr := r.URL.Query()
-		idx := qStr["idx"]
-		memeId := chi.URLParam(r, "memeId")
-		id, err := strconv.Atoi(memeId)
-		if err != nil {
-			respondWithErr(w, 400, "memeId must be an int")
-			return
-		}
-		meme, err := memesModel.GetByID(uint(id))
-		if err != nil {
-			respondWithErr(w, 500, "error getting meme by id")
-			return
-		}
-		err = components.MemeModal(meme, idx[0]).Render(r.Context(), w)
-		if err != nil {
-			respondWithErr(w, 500, err.Error())
-		}
-	})
+	r.Get("/memes/{memeId}", get_Meme_By_Id(memesModel))
 
 	r.Get("/memes/new", func(w http.ResponseWriter, r *http.Request) {
 		newMemesComponent := components.New_Memes()
